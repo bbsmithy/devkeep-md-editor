@@ -32,7 +32,6 @@ export default class MdEditor extends React.Component {
 
   onScrollMDContainer = evt => {
     this.htmlContainerRef.current.scrollTop = this.mdContainerRef.current.scrollTop;
-    scrollHeightMD = this.mdContainerRef.current.scrollTop;
   };
 
   onScrollHTMLContainer = evt => {
