@@ -4,10 +4,10 @@ import _createClass from "@babel/runtime/helpers/esm/createClass";
 import _possibleConstructorReturn from "@babel/runtime/helpers/esm/possibleConstructorReturn";
 import _getPrototypeOf from "@babel/runtime/helpers/esm/getPrototypeOf";
 import _inherits from "@babel/runtime/helpers/esm/inherits";
-import * as React from "react";
-import "./MarkdownEditor.css";
+import * as React from 'react';
+import './MarkdownEditor.css';
 
-var MarkdownIt = require("markdown-it");
+var MarkdownIt = require('markdown-it');
 
 var md = new MarkdownIt({
   html: true // Enable HTML tags in source
@@ -26,6 +26,35 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(MdEditor).call(this, props));
 
+    _this.commandListener = function (e) {
+      if ((window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) && (e.keyCode === 83 || e.keyCode === 68 || e.keyCode === 86)) {
+        e.preventDefault();
+
+        switch (e.keyCode) {
+          case 83:
+            {
+              console.log('SAVE');
+              break;
+            }
+
+          case 68:
+            {
+              console.log('DELETE');
+              break;
+            }
+
+          case 86:
+            {
+              _this.setState({
+                displayMD: !_this.state.displayMD
+              });
+
+              break;
+            }
+        }
+      }
+    };
+
     _this.createHTML = function (markdown) {
       return md.render(markdown);
     };
@@ -34,27 +63,25 @@ function (_React$Component) {
       var html = _this.createHTML(evt.currentTarget.value);
 
       _this.setState({
-        html: html
+        html: html,
+        md: evt.currentTarget.value
       });
     };
 
-    _this.onScrollMDContainer = function (evt) {
-      _this.htmlContainerRef.current.scrollTop = _this.mdContainerRef.current.scrollTop;
-    };
-
-    _this.onScrollHTMLContainer = function (evt) {
-      _this.mdContainerRef.current.scrollTop = _this.htmlContainerRef.current.scrollTop;
-    };
-
-    _this.mdContainerRef = React.createRef();
-    _this.htmlContainerRef = React.createRef();
     _this.state = {
-      html: ""
+      html: '',
+      md: '',
+      displayMD: true
     };
     return _this;
   }
 
   _createClass(MdEditor, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      document.addEventListener('keydown', this.commandListener);
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
@@ -62,20 +89,16 @@ function (_React$Component) {
         style: _objectSpread({
           height: this.props.height
         }, this.props.styles.mainContainer)
-      }, React.createElement("div", {
+      }, this.state.displayMD && React.createElement("div", {
         className: "markdownContainer",
         style: this.props.styles.markdownContainer
       }, React.createElement("textarea", {
         className: "markdownEditor",
         style: this.props.styles.markdownEditor,
-        onScroll: this.onScrollMDContainer,
-        ref: this.mdContainerRef,
         onChange: this.onChangeMarkdown
-      })), React.createElement("div", {
+      }, this.state.md)), !this.state.displayMD && React.createElement("div", {
         className: "htmlContainer",
-        style: this.props.styles.htmlContainer,
-        onScroll: this.onScrollHTMLContainer,
-        ref: this.htmlContainerRef
+        style: this.props.styles.htmlContainer
       }, this.state.html && React.createElement("div", {
         dangerouslySetInnerHTML: {
           __html: this.state.html

@@ -21,7 +21,7 @@ export default class MdEditor extends React.Component {
   commandListener = e => {
     if (
       (window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) &&
-      (e.keyCode === 83 || e.keyCode === 68 || e.keyCode === 86)
+      (e.keyCode === 83 || e.keyCode === 68 || e.keyCode === 75)
     ) {
       e.preventDefault();
       switch (e.keyCode) {
@@ -33,7 +33,7 @@ export default class MdEditor extends React.Component {
           console.log('DELETE');
           break;
         }
-        case 86: {
+        case 75: {
           this.setState({
             displayMD: !this.state.displayMD
           });
@@ -59,6 +59,29 @@ export default class MdEditor extends React.Component {
     });
   };
 
+  // onTab = (o, e) => {
+  //   var kC = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
+  //   if (kC == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+  //     var oS = o.scrollTop;
+  //     if (o.setSelectionRange) {
+  //       var sS = o.selectionStart;
+  //       var sE = o.selectionEnd;
+  //       o.value = o.value.substring(0, sS) + '\t' + o.value.substr(sE);
+  //       o.setSelectionRange(sS + 1, sS + 1);
+  //       o.focus();
+  //     } else if (o.createTextRange) {
+  //       document.selection.createRange().text = '\t';
+  //       e.returnValue = false;
+  //     }
+  //     o.scrollTop = oS;
+  //     if (e.preventDefault) {
+  //       e.preventDefault();
+  //     }
+  //     return false;
+  //   }
+  //   return true;
+  // };
+
   render() {
     return (
       <div
@@ -75,6 +98,7 @@ export default class MdEditor extends React.Component {
           >
             <textarea
               className='markdownEditor'
+              // onKeyDown='insertTab(this, event)'
               style={this.props.styles.markdownEditor}
               onChange={this.onChangeMarkdown}
             >
