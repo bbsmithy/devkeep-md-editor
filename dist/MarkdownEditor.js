@@ -1,3 +1,4 @@
+import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
 import _classCallCheck from "@babel/runtime/helpers/esm/classCallCheck";
 import _createClass from "@babel/runtime/helpers/esm/createClass";
 import _possibleConstructorReturn from "@babel/runtime/helpers/esm/possibleConstructorReturn";
@@ -39,7 +40,6 @@ function (_React$Component) {
 
     _this.onScrollMDContainer = function (evt) {
       _this.htmlContainerRef.current.scrollTop = _this.mdContainerRef.current.scrollTop;
-      scrollHeightMD = _this.mdContainerRef.current.scrollTop;
     };
 
     _this.onScrollHTMLContainer = function (evt) {
@@ -59,18 +59,21 @@ function (_React$Component) {
     value: function render() {
       return React.createElement("div", {
         className: "mainContainer",
-        style: {
+        style: _objectSpread({
           height: this.props.height
-        }
+        }, this.props.styles.mainContainer)
       }, React.createElement("div", {
-        className: "markdownContainer"
+        className: "markdownContainer",
+        style: this.props.styles.markdownContainer
       }, React.createElement("textarea", {
         className: "markdownEditor",
+        style: this.props.styles.markdownEditor,
         onScroll: this.onScrollMDContainer,
         ref: this.mdContainerRef,
         onChange: this.onChangeMarkdown
       })), React.createElement("div", {
         className: "htmlContainer",
+        style: this.props.styles.htmlContainer,
         onScroll: this.onScrollHTMLContainer,
         ref: this.htmlContainerRef
       }, this.state.html && React.createElement("div", {

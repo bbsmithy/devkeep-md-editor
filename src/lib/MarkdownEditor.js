@@ -1,7 +1,7 @@
-import * as React from "react";
-import "./MarkdownEditor.css";
+import * as React from 'react';
+import './MarkdownEditor.css';
 
-const MarkdownIt = require("markdown-it");
+const MarkdownIt = require('markdown-it');
 
 const md = new MarkdownIt({
   html: true // Enable HTML tags in source
@@ -11,12 +11,40 @@ export default class MdEditor extends React.Component {
   constructor(props) {
     super(props);
 
-    this.mdContainerRef = React.createRef();
-    this.htmlContainerRef = React.createRef();
-
     this.state = {
-      html: ""
+      html: '',
+      md: '',
+      displayMD: true
     };
+  }
+
+  commandListener = e => {
+    if (
+      (window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) &&
+      (e.keyCode === 83 || e.keyCode === 68 || e.keyCode === 86)
+    ) {
+      e.preventDefault();
+      switch (e.keyCode) {
+        case 83: {
+          console.log('SAVE');
+          break;
+        }
+        case 68: {
+          console.log('DELETE');
+          break;
+        }
+        case 86: {
+          this.setState({
+            displayMD: !this.state.displayMD
+          });
+          break;
+        }
+      }
+    }
+  };
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.commandListener);
   }
 
   createHTML = markdown => {
@@ -26,38 +54,44 @@ export default class MdEditor extends React.Component {
   onChangeMarkdown = evt => {
     const html = this.createHTML(evt.currentTarget.value);
     this.setState({
-      html
+      html,
+      md: evt.currentTarget.value
     });
-  };
-
-  onScrollMDContainer = evt => {
-    this.htmlContainerRef.current.scrollTop = this.mdContainerRef.current.scrollTop;
-  };
-
-  onScrollHTMLContainer = evt => {
-    this.mdContainerRef.current.scrollTop = this.htmlContainerRef.current.scrollTop;
   };
 
   render() {
     return (
-      <div className="mainContainer" style={{ height: this.props.height }}>
-        <div className="markdownContainer">
-          <textarea
-            className="markdownEditor"
-            onScroll={this.onScrollMDContainer}
-            ref={this.mdContainerRef}
-            onChange={this.onChangeMarkdown}
-          ></textarea>
-        </div>
-        <div
-          className="htmlContainer"
-          onScroll={this.onScrollHTMLContainer}
-          ref={this.htmlContainerRef}
-        >
-          {this.state.html && (
-            <div dangerouslySetInnerHTML={{ __html: this.state.html }}></div>
-          )}
-        </div>
+      <div
+        className='mainContainer'
+        style={{
+          height: this.props.height,
+          ...this.props.styles.mainContainer
+        }}
+      >
+        {this.state.displayMD && (
+          <div
+            className='markdownContainer'
+            style={this.props.styles.markdownContainer}
+          >
+            <textarea
+              className='markdownEditor'
+              style={this.props.styles.markdownEditor}
+              onChange={this.onChangeMarkdown}
+            >
+              {this.state.md}
+            </textarea>
+          </div>
+        )}
+        {!this.state.displayMD && (
+          <div
+            className='htmlContainer'
+            style={this.props.styles.htmlContainer}
+          >
+            {this.state.html && (
+              <div dangerouslySetInnerHTML={{ __html: this.state.html }}></div>
+            )}
+          </div>
+        )}
       </div>
     );
   }
