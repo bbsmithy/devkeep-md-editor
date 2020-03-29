@@ -1,24 +1,26 @@
 import * as React from 'react';
 import './MarkdownEditor.css';
+import Controls from './Controls';
 
 const MarkdownIt = require('markdown-it');
 
-const md = new MarkdownIt({
+const mdIt = new MarkdownIt({
   html: true // Enable HTML tags in source
 });
 
-export default class MdEditor extends React.Component {
-  constructor(props) {
-    super(props);
+const titleControls = ['H1', 'H2', 'H3', 'H4'];
 
-    this.state = {
-      html: '',
-      md: '',
-      displayMD: true
-    };
-  }
+const MdEditor = props => {
+  const [html, setHTML] = React.useState();
+  const [md, setMD] = React.useState();
+  const [displayMD, setDisplayMD] = React.useState(true);
 
-  commandListener = e => {
+  React.useEffect(() => {
+    document.addEventListener('keydown', commandListener);
+    return () => document.removeEventListener('keydown', commandListener);
+  }, [displayMD]);
+
+  const commandListener = e => {
     if (
       (window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) &&
       (e.keyCode === 83 || e.keyCode === 68 || e.keyCode === 75)
@@ -26,97 +28,163 @@ export default class MdEditor extends React.Component {
       e.preventDefault();
       switch (e.keyCode) {
         case 83: {
-          console.log('SAVE');
+          props.onSave(md, html);
           break;
         }
         case 68: {
-          console.log('DELETE');
+          props.onDelete();
           break;
         }
         case 75: {
-          this.setState({
-            displayMD: !this.state.displayMD
-          });
+          setDisplayMD(!displayMD);
           break;
         }
       }
     }
   };
 
-  componentDidMount() {
-    document.addEventListener('keydown', this.commandListener);
-  }
-
-  createHTML = markdown => {
-    return md.render(markdown);
+  const saveMDAndHTMLState = markdown => {
+    const html = createHTML(markdown);
+    setHTML(html);
+    setMD(markdown);
   };
 
-  onChangeMarkdown = evt => {
-    const html = this.createHTML(evt.currentTarget.value);
-    this.setState({
-      html,
-      md: evt.currentTarget.value
-    });
+  const createHTML = markdown => {
+    return mdIt.render(markdown);
   };
 
-  // onTab = (o, e) => {
-  //   var kC = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
-  //   if (kC == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-  //     var oS = o.scrollTop;
-  //     if (o.setSelectionRange) {
-  //       var sS = o.selectionStart;
-  //       var sE = o.selectionEnd;
-  //       o.value = o.value.substring(0, sS) + '\t' + o.value.substr(sE);
-  //       o.setSelectionRange(sS + 1, sS + 1);
-  //       o.focus();
-  //     } else if (o.createTextRange) {
-  //       document.selection.createRange().text = '\t';
-  //       e.returnValue = false;
-  //     }
-  //     o.scrollTop = oS;
-  //     if (e.preventDefault) {
-  //       e.preventDefault();
-  //     }
-  //     return false;
-  //   }
-  //   return true;
-  // };
+  const onChangeMarkdown = evt => {
+    saveMDAndHTMLState(evt.currentTarget.value);
+  };
 
-  render() {
-    return (
+  const onTab = e => {
+    var textarea = e.currentTarget;
+    var keyCode = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
+    if (keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+      e.preventDefault();
+      if (textarea.setSelectionRange) {
+        var sS = textarea.selectionStart;
+        var sE = textarea.selectionEnd;
+        const insertAfterText = textarea.value.substring(0, sS);
+        const stateWithTab = insertAfterText + '\t' + textarea.value.substr(sE);
+        setMD(stateWithTab);
+      } else if (textarea.createTextRange) {
+        document.selection.createRange().text = '\t';
+        e.returnValue = false;
+      }
+      return false;
+    }
+    return true;
+  };
+
+  const replaceHeadingMD = (heading, headingMDCode) => {
+    const filteredHeading = heading.replace(/#/g, '').trim();
+    const newHeading = `${headingMDCode} ${filteredHeading}`;
+    return newHeading;
+  };
+
+  const transform = (control, mdMark) => {
+    const textarea = document.getElementById('devkeep-md-textarea');
+    const sStart = textarea.selectionStart;
+    const sEnd = textarea.selectionEnd;
+
+    const remainingTextBeforeSelection = textarea.value.substring(0, sStart);
+    const selectedText = textarea.value.substring(sStart, sEnd);
+    const remainingTextAfterSelection = textarea.value.substr(sEnd);
+
+    if (titleControls.includes(control)) {
+      const newHeading = replaceHeadingMD(selectedText, mdMark);
+      const stateWithMDMark =
+        remainingTextBeforeSelection + newHeading + remainingTextAfterSelection;
+      saveMDAndHTMLState(stateWithMDMark);
+      console.log(sEnd, sStart, stateWithMDMark);
+    }
+  };
+
+  const onSelectControl = evt => {
+    const control = evt.currentTarget.value;
+
+    switch (control) {
+      case 'H1': {
+        console.log('handle h1');
+        transform(control, '#');
+        break;
+      }
+      case 'H2': {
+        console.log('handle h2');
+        transform(control, '##');
+        break;
+      }
+      case 'H3': {
+        console.log('handle h3');
+        transform(control, '###');
+        break;
+      }
+      case 'H4': {
+        console.log('handle h4');
+        transform(control, '####');
+        break;
+      }
+      case 'CODE': {
+        console.log('handle code');
+        transform(control);
+        break;
+      }
+      case 'BLOCKQUOTE': {
+        console.log('handle blockqoute');
+        transform(control);
+        break;
+      }
+      case 'OL': {
+        console.log('handle ol');
+        transform(control);
+        break;
+      }
+      case 'UL': {
+        console.log('handle ul');
+        transform(control);
+        break;
+      }
+      default: {
+        console.log('NO CONTROL');
+        transform(control);
+      }
+    }
+  };
+
+  return (
+    <>
+      {displayMD && <Controls onSelectControl={onSelectControl} />}
       <div
         className='mainContainer'
         style={{
-          height: this.props.height,
-          ...this.props.styles.mainContainer
+          height: props.height,
+          ...props.styles.mainContainer
         }}
       >
-        {this.state.displayMD && (
+        {displayMD && (
           <div
             className='markdownContainer'
-            style={this.props.styles.markdownContainer}
+            style={props.styles.markdownContainer}
           >
             <textarea
               className='markdownEditor'
-              // onKeyDown='insertTab(this, event)'
-              style={this.props.styles.markdownEditor}
-              onChange={this.onChangeMarkdown}
-            >
-              {this.state.md}
-            </textarea>
+              id='devkeep-md-textarea'
+              onKeyDown={event => onTab(event)}
+              style={props.styles.markdownEditor}
+              onChange={onChangeMarkdown}
+              value={md}
+            />
           </div>
         )}
-        {!this.state.displayMD && (
-          <div
-            className='htmlContainer'
-            style={this.props.styles.htmlContainer}
-          >
-            {this.state.html && (
-              <div dangerouslySetInnerHTML={{ __html: this.state.html }}></div>
-            )}
+        {!displayMD && (
+          <div className='htmlContainer' style={props.styles.htmlContainer}>
+            {html && <div dangerouslySetInnerHTML={{ __html: html }}></div>}
           </div>
         )}
       </div>
-    );
-  }
-}
+    </>
+  );
+};
+
+export default MdEditor;
