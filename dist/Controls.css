@@ -1,0 +1,13 @@
+.controls-container {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.controls-container button {
+  border-radius: 2px;
+  margin-right: 4px;
+}
+
+.controls-container button:focus {
+  outline: none;
+}
