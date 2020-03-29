@@ -9,6 +9,23 @@ const styles = {
   htmlContainer: { color: 'white' }
 };
 
-const App = () => <MarkdownEditor text='hello' height={700} styles={styles} />;
+const App = () => {
+  const onSave = (md, html) => {
+    console.log(md, html);
+  };
+
+  const onDelete = () => {
+    console.log('DELETE');
+  };
+
+  return (
+    <MarkdownEditor
+      height={700}
+      styles={styles}
+      onSave={onSave}
+      onDelete={onDelete}
+    />
+  );
+};
 
 render(<App />, document.getElementById('root'));
