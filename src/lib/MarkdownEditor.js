@@ -12,21 +12,35 @@ const titleControls = ['H1', 'H2', 'H3', 'H4'];
 
 const MdEditor = props => {
   const [html, setHTML] = React.useState();
-  const [md, setMD] = React.useState();
+  const [md, setMD] = React.useState('');
   const [displayMD, setDisplayMD] = React.useState(true);
+  const textarea = React.useRef(null);
 
   React.useEffect(() => {
+    setTextAreaFocus(md.length);
     document.addEventListener('keydown', commandListener);
     return () => document.removeEventListener('keydown', commandListener);
   }, [displayMD]);
 
+  const setTextAreaFocus = selectionEnd => {
+    if (textarea.current) {
+      textarea.current.focus();
+      textarea.current.setSelectionRange(selectionEnd, selectionEnd);
+    }
+  };
+
   const commandListener = e => {
+    const keyCode = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
+    const cmdUsed = window.navigator.platform.match('Mac')
+      ? e.metaKey
+      : e.ctrlKey;
+    const tabPressed = keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
     if (
-      (window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) &&
-      (e.keyCode === 83 || e.keyCode === 68 || e.keyCode === 75)
+      (cmdUsed || tabPressed) &&
+      (keyCode === 83 || keyCode === 68 || keyCode === 75 || keyCode === 9)
     ) {
       e.preventDefault();
-      switch (e.keyCode) {
+      switch (keyCode) {
         case 83: {
           props.onSave(md, html);
           break;
@@ -37,6 +51,19 @@ const MdEditor = props => {
         }
         case 75: {
           setDisplayMD(!displayMD);
+          break;
+        }
+        case 9: {
+          if (textarea.current.setSelectionRange) {
+            var sS = textarea.current.selectionStart;
+            var sE = textarea.current.selectionEnd;
+            const insertAfterText = textarea.current.value.substring(0, sS);
+            const insertAfterTextWithTab = insertAfterText + '\t';
+            const stateWithTab =
+              insertAfterTextWithTab + textarea.current.value.substr(sE);
+            setMD(stateWithTab);
+            setTextAreaFocus(insertAfterTextWithTab.length);
+          }
           break;
         }
       }
@@ -57,26 +84,6 @@ const MdEditor = props => {
     saveMDAndHTMLState(evt.currentTarget.value);
   };
 
-  const onTab = e => {
-    var textarea = e.currentTarget;
-    var keyCode = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
-    if (keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-      e.preventDefault();
-      if (textarea.setSelectionRange) {
-        var sS = textarea.selectionStart;
-        var sE = textarea.selectionEnd;
-        const insertAfterText = textarea.value.substring(0, sS);
-        const stateWithTab = insertAfterText + '\t' + textarea.value.substr(sE);
-        setMD(stateWithTab);
-      } else if (textarea.createTextRange) {
-        document.selection.createRange().text = '\t';
-        e.returnValue = false;
-      }
-      return false;
-    }
-    return true;
-  };
-
   const replaceHeadingMD = (heading, headingMDCode) => {
     const filteredHeading = heading.replace(/#/g, '').trim();
     const newHeading = `${headingMDCode} ${filteredHeading}`;
@@ -84,7 +91,6 @@ const MdEditor = props => {
   };
 
   const transform = (control, mdMark) => {
-    const textarea = document.getElementById('devkeep-md-textarea');
     const sStart = textarea.selectionStart;
     const sEnd = textarea.selectionEnd;
 
@@ -170,10 +176,10 @@ const MdEditor = props => {
             <textarea
               className='markdownEditor'
               id='devkeep-md-textarea'
-              onKeyDown={event => onTab(event)}
               style={props.styles.markdownEditor}
               onChange={onChangeMarkdown}
               value={md}
+              ref={textarea}
             />
           </div>
         )}
