@@ -54,19 +54,23 @@ const MdEditor = props => {
           break;
         }
         case 9: {
-          if (textarea.current.setSelectionRange) {
-            var sS = textarea.current.selectionStart;
-            var sE = textarea.current.selectionEnd;
-            const insertAfterText = textarea.current.value.substring(0, sS);
-            const insertAfterTextWithTab = insertAfterText + '\t';
-            const stateWithTab =
-              insertAfterTextWithTab + textarea.current.value.substr(sE);
-            setMD(stateWithTab);
-            setTextAreaFocus(insertAfterTextWithTab.length);
-          }
+          insertTab();
           break;
         }
       }
+    }
+  };
+
+  const insertTab = () => {
+    if (textarea.current.setSelectionRange) {
+      var sS = textarea.current.selectionStart;
+      var sE = textarea.current.selectionEnd;
+      const insertAfterText = textarea.current.value.substring(0, sS);
+      const insertAfterTextWithTab = insertAfterText + '\t';
+      const stateWithTab =
+        insertAfterTextWithTab + textarea.current.value.substr(sE);
+      setMD(stateWithTab);
+      setTextAreaFocus(insertAfterTextWithTab.length);
     }
   };
 
@@ -90,22 +94,26 @@ const MdEditor = props => {
     return newHeading;
   };
 
-  const transform = (control, mdMark) => {
-    const sStart = textarea.selectionStart;
-    const sEnd = textarea.selectionEnd;
+  const titleTransform = (control, mdMark) => {
+    const sStart = textarea.current.selectionStart;
+    const sEnd = textarea.current.selectionEnd;
 
-    const remainingTextBeforeSelection = textarea.value.substring(0, sStart);
-    const selectedText = textarea.value.substring(sStart, sEnd);
-    const remainingTextAfterSelection = textarea.value.substr(sEnd);
+    const remainingTextBeforeSelection = textarea.current.value.substring(
+      0,
+      sStart
+    );
+    const selectedText = textarea.current.value.substring(sStart, sEnd);
+    const remainingTextAfterSelection = textarea.current.value.substr(sEnd);
 
     if (titleControls.includes(control)) {
       const newHeading = replaceHeadingMD(selectedText, mdMark);
       const stateWithMDMark =
         remainingTextBeforeSelection + newHeading + remainingTextAfterSelection;
       saveMDAndHTMLState(stateWithMDMark);
-      console.log(sEnd, sStart, stateWithMDMark);
     }
   };
+
+  const codeTransform = () => {};
 
   const onSelectControl = evt => {
     const control = evt.currentTarget.value;
@@ -113,47 +121,47 @@ const MdEditor = props => {
     switch (control) {
       case 'H1': {
         console.log('handle h1');
-        transform(control, '#');
+        titleTransform(control, '#');
         break;
       }
       case 'H2': {
         console.log('handle h2');
-        transform(control, '##');
+        titleTransform(control, '##');
         break;
       }
       case 'H3': {
         console.log('handle h3');
-        transform(control, '###');
+        titleTransform(control, '###');
         break;
       }
       case 'H4': {
         console.log('handle h4');
-        transform(control, '####');
+        titleTransform(control, '####');
         break;
       }
       case 'CODE': {
         console.log('handle code');
-        transform(control);
+        // transform(control);
         break;
       }
       case 'BLOCKQUOTE': {
         console.log('handle blockqoute');
-        transform(control);
+        // transform(control);
         break;
       }
       case 'OL': {
         console.log('handle ol');
-        transform(control);
+        // transform(control);
         break;
       }
       case 'UL': {
         console.log('handle ul');
-        transform(control);
+        // transform(control);
         break;
       }
       default: {
         console.log('NO CONTROL');
-        transform(control);
+        // transform(control);
       }
     }
   };
