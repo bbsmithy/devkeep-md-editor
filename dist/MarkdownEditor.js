@@ -18,7 +18,7 @@ var MdEditor = function MdEditor(props) {
       html = _React$useState2[0],
       setHTML = _React$useState2[1];
 
-  var _React$useState3 = React.useState(),
+  var _React$useState3 = React.useState(''),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
       md = _React$useState4[0],
       setMD = _React$useState4[1];
@@ -28,18 +28,31 @@ var MdEditor = function MdEditor(props) {
       displayMD = _React$useState6[0],
       setDisplayMD = _React$useState6[1];
 
+  var textarea = React.useRef(null);
   React.useEffect(function () {
+    setTextAreaFocus(md.length);
     document.addEventListener('keydown', commandListener);
     return function () {
       return document.removeEventListener('keydown', commandListener);
     };
   }, [displayMD]);
 
+  var setTextAreaFocus = function setTextAreaFocus(selectionEnd) {
+    if (textarea.current) {
+      textarea.current.focus();
+      textarea.current.setSelectionRange(selectionEnd, selectionEnd);
+    }
+  };
+
   var commandListener = function commandListener(e) {
-    if ((window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) && (e.keyCode === 83 || e.keyCode === 68 || e.keyCode === 75)) {
+    var keyCode = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
+    var cmdUsed = window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey;
+    var tabPressed = keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
+
+    if ((cmdUsed || tabPressed) && (keyCode === 83 || keyCode === 68 || keyCode === 75 || keyCode === 9)) {
       e.preventDefault();
 
-      switch (e.keyCode) {
+      switch (keyCode) {
         case 83:
           {
             props.onSave(md, html);
@@ -57,7 +70,25 @@ var MdEditor = function MdEditor(props) {
             setDisplayMD(!displayMD);
             break;
           }
+
+        case 9:
+          {
+            insertTab();
+            break;
+          }
       }
+    }
+  };
+
+  var insertTab = function insertTab() {
+    if (textarea.current.setSelectionRange) {
+      var sS = textarea.current.selectionStart;
+      var sE = textarea.current.selectionEnd;
+      var insertAfterText = textarea.current.value.substring(0, sS);
+      var insertAfterTextWithTab = insertAfterText + '\t';
+      var stateWithTab = insertAfterTextWithTab + textarea.current.value.substr(sE);
+      setMD(stateWithTab);
+      setTextAreaFocus(insertAfterTextWithTab.length);
     }
   };
 
@@ -75,28 +106,17 @@ var MdEditor = function MdEditor(props) {
     saveMDAndHTMLState(evt.currentTarget.value);
   };
 
-  var onTab = function onTab(e) {
-    var textarea = e.currentTarget;
-    var keyCode = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
-
-    if (keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-      e.preventDefault();
-
-      if (textarea.setSelectionRange) {
-        var sS = textarea.selectionStart;
-        var sE = textarea.selectionEnd;
-        var insertAfterText = textarea.value.substring(0, sS);
-        var stateWithTab = insertAfterText + '\t' + textarea.value.substr(sE);
-        setMD(stateWithTab);
-      } else if (textarea.createTextRange) {
-        document.selection.createRange().text = '\t';
-        e.returnValue = false;
-      }
-
-      return false;
-    }
-
-    return true;
+  var getSelectionState = function getSelectionState() {
+    var sStart = textarea.current.selectionStart;
+    var sEnd = textarea.current.selectionEnd;
+    var textBeforeSelection = textarea.current.value.substring(0, sStart);
+    var selectedText = textarea.current.value.substring(sStart, sEnd);
+    var textAfterSelection = textarea.current.value.substr(sEnd);
+    return {
+      textBeforeSelection: textBeforeSelection,
+      selectedText: selectedText,
+      textAfterSelection: textAfterSelection
+    };
   };
 
   var replaceHeadingMD = function replaceHeadingMD(heading, headingMDCode) {
@@ -105,20 +125,20 @@ var MdEditor = function MdEditor(props) {
     return newHeading;
   };
 
-  var transform = function transform(control, mdMark) {
-    var textarea = document.getElementById('devkeep-md-textarea');
-    var sStart = textarea.selectionStart;
-    var sEnd = textarea.selectionEnd;
-    var remainingTextBeforeSelection = textarea.value.substring(0, sStart);
-    var selectedText = textarea.value.substring(sStart, sEnd);
-    var remainingTextAfterSelection = textarea.value.substr(sEnd);
+  var titleTransform = function titleTransform(control, mdMark) {
+    var _getSelectionState = getSelectionState(),
+        textBeforeSelection = _getSelectionState.textBeforeSelection,
+        selectedText = _getSelectionState.selectedText,
+        textAfterSelection = _getSelectionState.textAfterSelection;
 
-    if (titleControls.includes(control)) {
-      var newHeading = replaceHeadingMD(selectedText, mdMark);
-      var stateWithMDMark = remainingTextBeforeSelection + newHeading + remainingTextAfterSelection;
-      saveMDAndHTMLState(stateWithMDMark);
-      console.log(sEnd, sStart, stateWithMDMark);
-    }
+    var newHeading = replaceHeadingMD(selectedText, mdMark);
+    var stateWithMDMark = textBeforeSelection + newHeading + textAfterSelection;
+    saveMDAndHTMLState(stateWithMDMark);
+  };
+
+  var codeTransform = function codeTransform() {
+    var state = getSelectionState();
+    console.log(state);
   };
 
   var onSelectControl = function onSelectControl(evt) {
@@ -128,63 +148,62 @@ var MdEditor = function MdEditor(props) {
       case 'H1':
         {
           console.log('handle h1');
-          transform(control, '#');
+          titleTransform(control, '#');
           break;
         }
 
       case 'H2':
         {
           console.log('handle h2');
-          transform(control, '##');
+          titleTransform(control, '##');
           break;
         }
 
       case 'H3':
         {
           console.log('handle h3');
-          transform(control, '###');
+          titleTransform(control, '###');
           break;
         }
 
       case 'H4':
         {
           console.log('handle h4');
-          transform(control, '####');
+          titleTransform(control, '####');
           break;
         }
 
       case 'CODE':
         {
           console.log('handle code');
-          transform(control);
+          codeTransform();
           break;
         }
 
       case 'BLOCKQUOTE':
         {
-          console.log('handle blockqoute');
-          transform(control);
+          console.log('handle blockqoute'); // transform(control);
+
           break;
         }
 
       case 'OL':
         {
-          console.log('handle ol');
-          transform(control);
+          console.log('handle ol'); // transform(control);
+
           break;
         }
 
       case 'UL':
         {
-          console.log('handle ul');
-          transform(control);
+          console.log('handle ul'); // transform(control);
+
           break;
         }
 
       default:
         {
-          console.log('NO CONTROL');
-          transform(control);
+          console.log('NO CONTROL'); // transform(control);
         }
     }
   };
@@ -202,12 +221,10 @@ var MdEditor = function MdEditor(props) {
   }, React.createElement("textarea", {
     className: "markdownEditor",
     id: "devkeep-md-textarea",
-    onKeyDown: function onKeyDown(event) {
-      return onTab(event);
-    },
     style: props.styles.markdownEditor,
     onChange: onChangeMarkdown,
-    value: md
+    value: md,
+    ref: textarea
   })), !displayMD && React.createElement("div", {
     className: "htmlContainer",
     style: props.styles.htmlContainer

@@ -88,6 +88,16 @@ const MdEditor = props => {
     saveMDAndHTMLState(evt.currentTarget.value);
   };
 
+  const getSelectionState = () => {
+    const sStart = textarea.current.selectionStart;
+    const sEnd = textarea.current.selectionEnd;
+    const textBeforeSelection = textarea.current.value.substring(0, sStart);
+    const selectedText = textarea.current.value.substring(sStart, sEnd);
+    const textAfterSelection = textarea.current.value.substr(sEnd);
+
+    return { textBeforeSelection, selectedText, textAfterSelection };
+  };
+
   const replaceHeadingMD = (heading, headingMDCode) => {
     const filteredHeading = heading.replace(/#/g, '').trim();
     const newHeading = `${headingMDCode} ${filteredHeading}`;
@@ -95,25 +105,21 @@ const MdEditor = props => {
   };
 
   const titleTransform = (control, mdMark) => {
-    const sStart = textarea.current.selectionStart;
-    const sEnd = textarea.current.selectionEnd;
-
-    const remainingTextBeforeSelection = textarea.current.value.substring(
-      0,
-      sStart
-    );
-    const selectedText = textarea.current.value.substring(sStart, sEnd);
-    const remainingTextAfterSelection = textarea.current.value.substr(sEnd);
-
-    if (titleControls.includes(control)) {
-      const newHeading = replaceHeadingMD(selectedText, mdMark);
-      const stateWithMDMark =
-        remainingTextBeforeSelection + newHeading + remainingTextAfterSelection;
-      saveMDAndHTMLState(stateWithMDMark);
-    }
+    const {
+      textBeforeSelection,
+      selectedText,
+      textAfterSelection
+    } = getSelectionState();
+    const newHeading = replaceHeadingMD(selectedText, mdMark);
+    const stateWithMDMark =
+      textBeforeSelection + newHeading + textAfterSelection;
+    saveMDAndHTMLState(stateWithMDMark);
   };
 
-  const codeTransform = () => {};
+  const codeTransform = () => {
+    const state = getSelectionState();
+    console.log(state);
+  };
 
   const onSelectControl = evt => {
     const control = evt.currentTarget.value;
@@ -141,7 +147,7 @@ const MdEditor = props => {
       }
       case 'CODE': {
         console.log('handle code');
-        // transform(control);
+        codeTransform();
         break;
       }
       case 'BLOCKQUOTE': {

@@ -6,10 +6,14 @@ The plan is to keep it very simple starting out with heading controls, code bloc
 The markdown parser i'm using is [markdown-it](https://github.com/markdown-it/markdown-it), so anything you can do with that you should be able to do here.
 I'm going to try an write a markdown parser soon in Rust and compile to web assembly for this, because why not!
 
+CMD+K toggle between markdown and rendered html
+CMD+S to run save returning html and markdown
+CMD+D to for delete control
+
 ```javascript
 import React from 'react';
 import { render } from 'react-dom';
-import { MarkdownEditor } from './lib';
+import { MarkdownEditor } from 'devkeep-md-editor';
 
 const styles = {
   mainContainer: { backgroundColor: '#333' },
