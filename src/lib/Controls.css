@@ -5,7 +5,13 @@
 
 .controls-container button {
   border-radius: 2px;
-  margin-right: 4px;
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+.controls-container input {
+  margin-right: 2px;
+  margin-left: 2px;
 }
 
 .controls-container button:focus {

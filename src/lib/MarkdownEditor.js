@@ -8,13 +8,14 @@ const mdIt = new MarkdownIt({
   html: true // Enable HTML tags in source
 });
 
-const titleControls = ['H1', 'H2', 'H3', 'H4'];
+const codeBackTicks = '```';
 
 const MdEditor = props => {
   const [html, setHTML] = React.useState();
   const [md, setMD] = React.useState('');
   const [displayMD, setDisplayMD] = React.useState(true);
   const textarea = React.useRef(null);
+  const [codeLang, setCodeLang] = React.useState('');
 
   React.useEffect(() => {
     setTextAreaFocus(md.length);
@@ -104,7 +105,7 @@ const MdEditor = props => {
     return newHeading;
   };
 
-  const titleTransform = (control, mdMark) => {
+  const titleTransform = mdMark => {
     const {
       textBeforeSelection,
       selectedText,
@@ -117,8 +118,21 @@ const MdEditor = props => {
   };
 
   const codeTransform = () => {
-    const state = getSelectionState();
-    console.log(state);
+    const {
+      textBeforeSelection,
+      selectedText,
+      textAfterSelection
+    } = getSelectionState();
+    const selectedTextAsCodeBlock =
+      `${codeBackTicks}${codeLang}` +
+      '\n' +
+      selectedText +
+      '\n' +
+      `${codeBackTicks}`;
+    console.log(selectedText);
+    const stateWithCodeBlock =
+      textBeforeSelection + selectedTextAsCodeBlock + textAfterSelection;
+    saveMDAndHTMLState(stateWithCodeBlock);
   };
 
   const onSelectControl = evt => {
@@ -126,27 +140,22 @@ const MdEditor = props => {
 
     switch (control) {
       case 'H1': {
-        console.log('handle h1');
-        titleTransform(control, '#');
+        titleTransform('#');
         break;
       }
       case 'H2': {
-        console.log('handle h2');
-        titleTransform(control, '##');
+        titleTransform('##');
         break;
       }
       case 'H3': {
-        console.log('handle h3');
-        titleTransform(control, '###');
+        titleTransform('###');
         break;
       }
       case 'H4': {
-        console.log('handle h4');
-        titleTransform(control, '####');
+        titleTransform('####');
         break;
       }
       case 'CODE': {
-        console.log('handle code');
         codeTransform();
         break;
       }
@@ -172,9 +181,18 @@ const MdEditor = props => {
     }
   };
 
+  const onChangeLanguage = lang => {
+    setCodeLang(lang);
+  };
+
   return (
     <>
-      {displayMD && <Controls onSelectControl={onSelectControl} />}
+      {displayMD && (
+        <Controls
+          onSelectControl={onSelectControl}
+          onChangeLanguage={onChangeLanguage}
+        />
+      )}
       <div
         className='mainContainer'
         style={{

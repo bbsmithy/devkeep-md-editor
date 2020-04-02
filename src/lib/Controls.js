@@ -16,6 +16,9 @@ import './Controls.css';
 //       * (TEXT)
 
 const Controls = props => {
+  const onChangeLanguage = evt => {
+    props.onChangeLanguage(evt.target.value);
+  };
   return (
     <div className='controls-container'>
       <button value='H1' onClick={props.onSelectControl}>
@@ -33,6 +36,11 @@ const Controls = props => {
       <button value='CODE' onClick={props.onSelectControl}>
         Code
       </button>
+      <input
+        placeholder='lang'
+        onChange={onChangeLanguage}
+        style={{ width: 50 }}
+      />
       <button value='BLOCKQUOTE' onClick={props.onSelectControl}>
         Blockqoute
       </button>
