@@ -135,6 +135,22 @@ const MdEditor = props => {
     saveMDAndHTMLState(stateWithCodeBlock);
   };
 
+  const blockqouteTransform = () => {
+    const {
+      textBeforeSelection,
+      selectedText,
+      textAfterSelection
+    } = getSelectionState();
+
+    let selectedTextWithQuoteBlock = '';
+    selectedText.split('\n').forEach(line => {
+      selectedTextWithQuoteBlock += `> ${line} \n`;
+    });
+    const stateWithQuoteBlock =
+      textBeforeSelection + selectedTextWithQuoteBlock + textAfterSelection;
+    saveMDAndHTMLState(stateWithQuoteBlock);
+  };
+
   const onSelectControl = evt => {
     const control = evt.currentTarget.value;
 
@@ -160,8 +176,7 @@ const MdEditor = props => {
         break;
       }
       case 'BLOCKQUOTE': {
-        console.log('handle blockqoute');
-        // transform(control);
+        blockqouteTransform();
         break;
       }
       case 'OL': {
