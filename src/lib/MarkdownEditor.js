@@ -36,29 +36,50 @@ const MdEditor = props => {
       ? e.metaKey
       : e.ctrlKey;
     const tabPressed = keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
-    if (
-      (cmdUsed || tabPressed) &&
-      (keyCode === 83 || keyCode === 68 || keyCode === 75 || keyCode === 9)
-    ) {
+    const returnPressed = keyCode == 13;
+    const cmdKey = keyCode === 83 || keyCode === 68 || keyCode === 75;
+    if (cmdUsed && cmdKey) {
       e.preventDefault();
-      switch (keyCode) {
-        case 83: {
-          props.onSave(md, html);
-          break;
-        }
-        case 68: {
-          props.onDelete();
-          break;
-        }
-        case 75: {
-          setDisplayMD(!displayMD);
-          break;
-        }
-        case 9: {
-          insertTab();
-          break;
-        }
+      cmdAction(keyCode);
+    } else if (tabPressed || returnPressed) {
+      e.preventDefault();
+      formattingAction(keyCode);
+    }
+  };
+
+  // cmd/ctrl (save(CMD+S), delete(CMD+D), toogle md/html(CMD+K)) handler
+  const cmdAction = keyCode => {
+    switch (keyCode) {
+      case 83: {
+        props.onSave(md, html);
+        break;
       }
+      case 68: {
+        props.onDelete();
+        break;
+      }
+      case 75: {
+        setDisplayMD(!displayMD);
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  // Tab or new line handler
+  const formattingAction = keyCode => {
+    switch (keyCode) {
+      case 9: {
+        insertTab();
+        break;
+      }
+      case 13: {
+        insertNewLine();
+        break;
+      }
+      default:
+        break;
     }
   };
 
@@ -67,12 +88,24 @@ const MdEditor = props => {
       var sS = textarea.current.selectionStart;
       var sE = textarea.current.selectionEnd;
       const insertAfterText = textarea.current.value.substring(0, sS);
-      const insertAfterTextWithTab = insertAfterText + '\t';
+      const insertAfterTextWithTab = insertAfterText + '   ';
       const stateWithTab =
         insertAfterTextWithTab + textarea.current.value.substr(sE);
       setMD(stateWithTab);
       setTextAreaFocus(insertAfterTextWithTab.length);
     }
+  };
+
+  const insertNewLine = () => {
+    // This will check the previous line for indentation
+    // and then add the same indentation to the new line
+    const { textBeforeSelection, textAfterSelection } = getSelectionState();
+    const currentLine = getCurrentLine();
+    const indent = currentLine.match(/^\s*/)[0];
+    const textBeforeWithIndent = textBeforeSelection + '\n' + indent;
+    const stateWithNewLine = textBeforeWithIndent + textAfterSelection;
+    saveMDAndHTMLState(stateWithNewLine);
+    setTextAreaFocus(textBeforeWithIndent.length);
   };
 
   const saveMDAndHTMLState = markdown => {
@@ -87,6 +120,14 @@ const MdEditor = props => {
 
   const onChangeMarkdown = evt => {
     saveMDAndHTMLState(evt.currentTarget.value);
+  };
+
+  const getCurrentLine = () => {
+    const sStart = textarea.current.selectionStart;
+    return textarea.current.value
+      .substr(0, sStart)
+      .split('\n')
+      .pop();
   };
 
   const getSelectionState = () => {
@@ -151,6 +192,18 @@ const MdEditor = props => {
     saveMDAndHTMLState(stateWithQuoteBlock);
   };
 
+  const textStyleTransform = style => {
+    const {
+      textBeforeSelection,
+      selectedText,
+      textAfterSelection
+    } = getSelectionState();
+    const selectedTextWithStyle = `${style}${selectedText}${style}`;
+    const stateWithStyledBlock =
+      textBeforeSelection + selectedTextWithStyle + textAfterSelection;
+    saveMDAndHTMLState(stateWithStyledBlock);
+  };
+
   const onSelectControl = evt => {
     const control = evt.currentTarget.value;
 
@@ -177,6 +230,18 @@ const MdEditor = props => {
       }
       case 'BLOCKQUOTE': {
         blockqouteTransform();
+        break;
+      }
+      case 'BOLD': {
+        textStyleTransform('**');
+        break;
+      }
+      case 'ITALIC': {
+        textStyleTransform('*');
+        break;
+      }
+      case 'UNDERLINE': {
+        // underlineTransform();
         break;
       }
       case 'OL': {

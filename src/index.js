@@ -4,7 +4,7 @@ import { MarkdownEditor } from './lib';
 
 const styles = {
   mainContainer: { backgroundColor: '#333' },
-  markdownContainer: { color: '#333' },
+  markdownContainer: { color: 'white' },
   markdownEditor: { backgroundColor: '#333', color: 'white' },
   htmlContainer: { color: 'white' }
 };
@@ -19,12 +19,14 @@ const App = () => {
   };
 
   return (
-    <MarkdownEditor
-      height={700}
-      styles={styles}
-      onSave={onSave}
-      onDelete={onDelete}
-    />
+    <div style={{ margin: 'auto', width: '50%' }}>
+      <MarkdownEditor
+        height={700}
+        styles={styles}
+        onSave={onSave}
+        onDelete={onDelete}
+      />
+    </div>
   );
 };
 
