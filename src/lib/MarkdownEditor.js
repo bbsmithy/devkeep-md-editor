@@ -1,12 +1,35 @@
 import * as React from 'react';
-import './MarkdownEditor.css';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/a11y-dark.css';
 import Controls from './Controls';
+import './MarkdownEditor.css';
 
-const MarkdownIt = require('markdown-it');
+const showdown = require('showdown');
 
-const mdIt = new MarkdownIt({
-  html: true // Enable HTML tags in source
-});
+const sd = new showdown.Converter();
+
+
+
+sd.addExtension(() => {
+  return [{
+    type: "output",
+    filter: function (text, converter, options) {
+      var left = "<pre><code\\b[^>]*>",
+        right = "</code></pre>",
+        flags = "g";
+      var replacement = function (wholeMatch, match, left, right) {
+        var lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
+        left = left.slice(0, 18) + 'hljs ' + left.slice(18);
+        if (lang && hljs.getLanguage(lang)) {
+          return left + hljs.highlight(lang, match).value + right;
+        } else {
+          return left + hljs.highlightAuto(match).value + right;
+        }
+      };
+      return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
+    }
+  }];
+})
 
 const codeBackTicks = '```';
 
@@ -18,10 +41,27 @@ const MdEditor = props => {
   const [codeLang, setCodeLang] = React.useState('');
 
   React.useEffect(() => {
+    setInitialContent();
+  }, [])
+
+  React.useEffect(() => {
     setTextAreaFocus(md.length);
     document.addEventListener('keydown', commandListener);
     return () => document.removeEventListener('keydown', commandListener);
   }, [displayMD]);
+
+  const setInitialContent = () => {
+    const { type, content } = props.initialContent
+    if (type === 'html') {
+      setHTML(content);
+      const newMarkdown = sd.makeMarkdown(content);
+      setMD(newMarkdown);
+    } else if (type === 'md') {
+      setMD(content);
+      const newHtml = sd.makeHtml(content);
+      setHTML(newHtml);
+    }
+  }
 
   const setTextAreaFocus = selectionEnd => {
     if (textarea.current) {
@@ -35,8 +75,8 @@ const MdEditor = props => {
     const cmdUsed = window.navigator.platform.match('Mac')
       ? e.metaKey
       : e.ctrlKey;
-    const tabPressed = keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
-    const returnPressed = keyCode == 13;
+    const tabPressed = keyCode === 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
+    const returnPressed = keyCode === 13;
     const cmdKey = keyCode === 83 || keyCode === 68 || keyCode === 75;
     if (cmdUsed && cmdKey) {
       e.preventDefault();
@@ -115,7 +155,7 @@ const MdEditor = props => {
   };
 
   const createHTML = markdown => {
-    return mdIt.render(markdown);
+    return sd.makeHtml(markdown);
   };
 
   const onChangeMarkdown = evt => {
@@ -185,7 +225,7 @@ const MdEditor = props => {
 
     let selectedTextWithQuoteBlock = '';
     selectedText.split('\n').forEach(line => {
-      selectedTextWithQuoteBlock += `> ${line} \n`;
+      selectedTextWithQuoteBlock += `>${line} \n`;
     });
     const stateWithQuoteBlock =
       textBeforeSelection + selectedTextWithQuoteBlock + textAfterSelection;
@@ -240,10 +280,6 @@ const MdEditor = props => {
         textStyleTransform('*');
         break;
       }
-      case 'UNDERLINE': {
-        // underlineTransform();
-        break;
-      }
       case 'OL': {
         console.log('handle ol');
         // transform(control);
@@ -256,7 +292,6 @@ const MdEditor = props => {
       }
       default: {
         console.log('NO CONTROL');
-        // transform(control);
       }
     }
   };
@@ -295,10 +330,8 @@ const MdEditor = props => {
             />
           </div>
         )}
-        {!displayMD && (
-          <div className='htmlContainer' style={props.styles.htmlContainer}>
-            {html && <div dangerouslySetInnerHTML={{ __html: html }}></div>}
-          </div>
+        {!displayMD && html && (
+          <div className='htmlContainer' style={props.styles.htmlContainer} dangerouslySetInnerHTML={{ __html: html }}></div>
         )}
       </div>
     </>

@@ -10,7 +10,7 @@ var mdIt = new MarkdownIt({
   html: true // Enable HTML tags in source
 
 });
-var titleControls = ['H1', 'H2', 'H3', 'H4'];
+var codeBackTicks = '```';
 
 var MdEditor = function MdEditor(props) {
   var _React$useState = React.useState(),
@@ -29,6 +29,12 @@ var MdEditor = function MdEditor(props) {
       setDisplayMD = _React$useState6[1];
 
   var textarea = React.useRef(null);
+
+  var _React$useState7 = React.useState(''),
+      _React$useState8 = _slicedToArray(_React$useState7, 2),
+      codeLang = _React$useState8[0],
+      setCodeLang = _React$useState8[1];
+
   React.useEffect(function () {
     setTextAreaFocus(md.length);
     document.addEventListener('keydown', commandListener);
@@ -47,36 +53,62 @@ var MdEditor = function MdEditor(props) {
   var commandListener = function commandListener(e) {
     var keyCode = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
     var cmdUsed = window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey;
-    var tabPressed = keyCode == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
+    var tabPressed = keyCode === 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
+    var returnPressed = keyCode === 13;
+    var cmdKey = keyCode === 83 || keyCode === 68 || keyCode === 75;
 
-    if ((cmdUsed || tabPressed) && (keyCode === 83 || keyCode === 68 || keyCode === 75 || keyCode === 9)) {
+    if (cmdUsed && cmdKey) {
       e.preventDefault();
+      cmdAction(keyCode);
+    } else if (tabPressed || returnPressed) {
+      e.preventDefault();
+      formattingAction(keyCode);
+    }
+  }; // cmd/ctrl (save(CMD+S), delete(CMD+D), toogle md/html(CMD+K)) handler
 
-      switch (keyCode) {
-        case 83:
-          {
-            props.onSave(md, html);
-            break;
-          }
 
-        case 68:
-          {
-            props.onDelete();
-            break;
-          }
+  var cmdAction = function cmdAction(keyCode) {
+    switch (keyCode) {
+      case 83:
+        {
+          props.onSave(md, html);
+          break;
+        }
 
-        case 75:
-          {
-            setDisplayMD(!displayMD);
-            break;
-          }
+      case 68:
+        {
+          props.onDelete();
+          break;
+        }
 
-        case 9:
-          {
-            insertTab();
-            break;
-          }
-      }
+      case 75:
+        {
+          setDisplayMD(!displayMD);
+          break;
+        }
+
+      default:
+        break;
+    }
+  }; // Tab or new line handler
+
+
+  var formattingAction = function formattingAction(keyCode) {
+    switch (keyCode) {
+      case 9:
+        {
+          insertTab();
+          break;
+        }
+
+      case 13:
+        {
+          insertNewLine();
+          break;
+        }
+
+      default:
+        break;
     }
   };
 
@@ -85,11 +117,26 @@ var MdEditor = function MdEditor(props) {
       var sS = textarea.current.selectionStart;
       var sE = textarea.current.selectionEnd;
       var insertAfterText = textarea.current.value.substring(0, sS);
-      var insertAfterTextWithTab = insertAfterText + '\t';
+      var insertAfterTextWithTab = insertAfterText + '   ';
       var stateWithTab = insertAfterTextWithTab + textarea.current.value.substr(sE);
       setMD(stateWithTab);
       setTextAreaFocus(insertAfterTextWithTab.length);
     }
+  };
+
+  var insertNewLine = function insertNewLine() {
+    // This will check the previous line for indentation
+    // and then add the same indentation to the new line
+    var _getSelectionState = getSelectionState(),
+        textBeforeSelection = _getSelectionState.textBeforeSelection,
+        textAfterSelection = _getSelectionState.textAfterSelection;
+
+    var currentLine = getCurrentLine();
+    var indent = currentLine.match(/^\s*/)[0];
+    var textBeforeWithIndent = textBeforeSelection + '\n' + indent;
+    var stateWithNewLine = textBeforeWithIndent + textAfterSelection;
+    saveMDAndHTMLState(stateWithNewLine);
+    setTextAreaFocus(textBeforeWithIndent.length);
   };
 
   var saveMDAndHTMLState = function saveMDAndHTMLState(markdown) {
@@ -104,6 +151,11 @@ var MdEditor = function MdEditor(props) {
 
   var onChangeMarkdown = function onChangeMarkdown(evt) {
     saveMDAndHTMLState(evt.currentTarget.value);
+  };
+
+  var getCurrentLine = function getCurrentLine() {
+    var sStart = textarea.current.selectionStart;
+    return textarea.current.value.substr(0, sStart).split('\n').pop();
   };
 
   var getSelectionState = function getSelectionState() {
@@ -125,11 +177,11 @@ var MdEditor = function MdEditor(props) {
     return newHeading;
   };
 
-  var titleTransform = function titleTransform(control, mdMark) {
-    var _getSelectionState = getSelectionState(),
-        textBeforeSelection = _getSelectionState.textBeforeSelection,
-        selectedText = _getSelectionState.selectedText,
-        textAfterSelection = _getSelectionState.textAfterSelection;
+  var titleTransform = function titleTransform(mdMark) {
+    var _getSelectionState2 = getSelectionState(),
+        textBeforeSelection = _getSelectionState2.textBeforeSelection,
+        selectedText = _getSelectionState2.selectedText,
+        textAfterSelection = _getSelectionState2.textAfterSelection;
 
     var newHeading = replaceHeadingMD(selectedText, mdMark);
     var stateWithMDMark = textBeforeSelection + newHeading + textAfterSelection;
@@ -137,8 +189,40 @@ var MdEditor = function MdEditor(props) {
   };
 
   var codeTransform = function codeTransform() {
-    var state = getSelectionState();
-    console.log(state);
+    var _getSelectionState3 = getSelectionState(),
+        textBeforeSelection = _getSelectionState3.textBeforeSelection,
+        selectedText = _getSelectionState3.selectedText,
+        textAfterSelection = _getSelectionState3.textAfterSelection;
+
+    var selectedTextAsCodeBlock = "".concat(codeBackTicks).concat(codeLang) + '\n' + selectedText + '\n' + "".concat(codeBackTicks);
+    console.log(selectedText);
+    var stateWithCodeBlock = textBeforeSelection + selectedTextAsCodeBlock + textAfterSelection;
+    saveMDAndHTMLState(stateWithCodeBlock);
+  };
+
+  var blockqouteTransform = function blockqouteTransform() {
+    var _getSelectionState4 = getSelectionState(),
+        textBeforeSelection = _getSelectionState4.textBeforeSelection,
+        selectedText = _getSelectionState4.selectedText,
+        textAfterSelection = _getSelectionState4.textAfterSelection;
+
+    var selectedTextWithQuoteBlock = '';
+    selectedText.split('\n').forEach(function (line) {
+      selectedTextWithQuoteBlock += "> ".concat(line, " \n");
+    });
+    var stateWithQuoteBlock = textBeforeSelection + selectedTextWithQuoteBlock + textAfterSelection;
+    saveMDAndHTMLState(stateWithQuoteBlock);
+  };
+
+  var textStyleTransform = function textStyleTransform(style) {
+    var _getSelectionState5 = getSelectionState(),
+        textBeforeSelection = _getSelectionState5.textBeforeSelection,
+        selectedText = _getSelectionState5.selectedText,
+        textAfterSelection = _getSelectionState5.textAfterSelection;
+
+    var selectedTextWithStyle = "".concat(style).concat(selectedText).concat(style);
+    var stateWithStyledBlock = textBeforeSelection + selectedTextWithStyle + textAfterSelection;
+    saveMDAndHTMLState(stateWithStyledBlock);
   };
 
   var onSelectControl = function onSelectControl(evt) {
@@ -147,43 +231,55 @@ var MdEditor = function MdEditor(props) {
     switch (control) {
       case 'H1':
         {
-          console.log('handle h1');
-          titleTransform(control, '#');
+          titleTransform('#');
           break;
         }
 
       case 'H2':
         {
-          console.log('handle h2');
-          titleTransform(control, '##');
+          titleTransform('##');
           break;
         }
 
       case 'H3':
         {
-          console.log('handle h3');
-          titleTransform(control, '###');
+          titleTransform('###');
           break;
         }
 
       case 'H4':
         {
-          console.log('handle h4');
-          titleTransform(control, '####');
+          titleTransform('####');
           break;
         }
 
       case 'CODE':
         {
-          console.log('handle code');
           codeTransform();
           break;
         }
 
       case 'BLOCKQUOTE':
         {
-          console.log('handle blockqoute'); // transform(control);
+          blockqouteTransform();
+          break;
+        }
 
+      case 'BOLD':
+        {
+          textStyleTransform('**');
+          break;
+        }
+
+      case 'ITALIC':
+        {
+          textStyleTransform('*');
+          break;
+        }
+
+      case 'UNDERLINE':
+        {
+          // underlineTransform();
           break;
         }
 
@@ -208,8 +304,13 @@ var MdEditor = function MdEditor(props) {
     }
   };
 
+  var onChangeLanguage = function onChangeLanguage(lang) {
+    setCodeLang(lang);
+  };
+
   return React.createElement(React.Fragment, null, displayMD && React.createElement(Controls, {
-    onSelectControl: onSelectControl
+    onSelectControl: onSelectControl,
+    onChangeLanguage: onChangeLanguage
   }), React.createElement("div", {
     className: "mainContainer",
     style: _objectSpread({

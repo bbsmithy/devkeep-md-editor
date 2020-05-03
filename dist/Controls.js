@@ -13,6 +13,10 @@ import './Controls.css'; // H1 H2 H3 H4
 //       * (TEXT)
 
 var Controls = function Controls(props) {
+  var onChangeLanguage = function onChangeLanguage(evt) {
+    props.onChangeLanguage(evt.target.value);
+  };
+
   return React.createElement("div", {
     className: "controls-container"
   }, React.createElement("button", {
@@ -30,10 +34,22 @@ var Controls = function Controls(props) {
   }, "H4"), React.createElement("button", {
     value: "CODE",
     onClick: props.onSelectControl
-  }, "Code"), React.createElement("button", {
+  }, "Code"), React.createElement("input", {
+    placeholder: "lang",
+    onChange: onChangeLanguage,
+    style: {
+      width: 50
+    }
+  }), React.createElement("button", {
     value: "BLOCKQUOTE",
     onClick: props.onSelectControl
   }, "Blockqoute"), React.createElement("button", {
+    value: "BOLD",
+    onClick: props.onSelectControl
+  }, "Bold"), React.createElement("button", {
+    value: "ITALIC",
+    onClick: props.onSelectControl
+  }, "Italic"), React.createElement("button", {
     value: "OL",
     onClick: props.onSelectControl
   }, "OL"), React.createElement("button", {

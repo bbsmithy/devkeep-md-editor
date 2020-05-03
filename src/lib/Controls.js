@@ -44,6 +44,12 @@ const Controls = props => {
       <button value='BLOCKQUOTE' onClick={props.onSelectControl}>
         Blockqoute
       </button>
+      <button value='BOLD' onClick={props.onSelectControl}>
+        Bold
+      </button>
+      <button value='ITALIC' onClick={props.onSelectControl}>
+        Italic
+      </button>
       <button value='OL' onClick={props.onSelectControl}>
         OL
       </button>

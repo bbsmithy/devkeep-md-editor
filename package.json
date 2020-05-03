@@ -1,6 +1,6 @@
 {
   "name": "devkeep-md-editor",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "files": [
@@ -38,6 +38,8 @@
     ]
   },
   "dependencies": {
-    "markdown-it": "^10.0.0"
+    "highlight.js": "^10.0.1",
+    "showdown": "^1.9.1",
+    "showdown-highlight": "^2.1.4"
   }
 }
