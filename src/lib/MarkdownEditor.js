@@ -12,28 +12,26 @@ sd.addExtension(() => {
   return [{
     type: "output",
     filter(text, converter, options) {
-      let left = "<pre><code\\b[^>]*>"
-        , right = "</code></pre>"
-        , flags = "g"
-        , replacement = (wholeMatch, match, left, right) => {
-          match = decodeHtml(match);
-          let lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
+      const left = "<pre><code\\b[^>]*>"
+      const right = "</code></pre>"
+      const flags = "g"
+      const replacement = (wholeMatch, match, left, right) => {
+        match = decodeHtml(match);
+        let lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
 
-          if (left.includes(classAttr)) {
-            let attrIndex = left.indexOf(classAttr) + classAttr.length;
-            left = left.slice(0, attrIndex) + 'hljs ' + left.slice(attrIndex);
-          } else {
-            left = left.slice(0, -1) + ' class="hljs">';
-          }
-
-          if (lang && hljs.getLanguage(lang)) {
-            return left + hljs.highlight(lang, match).value + right;
-          } else {
-            return left + hljs.highlightAuto(match).value + right;
-          }
+        if (left.includes(classAttr)) {
+          let attrIndex = left.indexOf(classAttr) + classAttr.length;
+          left = left.slice(0, attrIndex) + 'hljs ' + left.slice(attrIndex);
+        } else {
+          left = left.slice(0, -1) + ' class="hljs">';
         }
-        ;
 
+        if (lang && hljs.getLanguage(lang)) {
+          return left + hljs.highlight(lang, match).value + right;
+        } else {
+          return left + hljs.highlightAuto(match).value + right;
+        }
+      };
       return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
     }
   }];
@@ -53,6 +51,10 @@ const MdEditor = props => {
   }, [])
 
   React.useEffect(() => {
+    if (!displayMD) {
+      const htmlToDisplay = createHTML(md);
+      setHTML(htmlToDisplay)
+    }
     setTextAreaFocus(md.length);
     document.addEventListener('keydown', commandListener);
     return () => document.removeEventListener('keydown', commandListener);
@@ -157,8 +159,6 @@ const MdEditor = props => {
   };
 
   const saveMDAndHTMLState = markdown => {
-    const html = createHTML(markdown);
-    setHTML(html);
     setMD(markdown);
   };
 
