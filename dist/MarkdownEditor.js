@@ -6,6 +6,10 @@ import 'highlight.js/styles/a11y-dark.css';
 import Controls from './Controls';
 import './MarkdownEditor.css';
 
+var decodeHtml = require("html-encoder-decoder").decode;
+
+var classAttr = 'class="';
+
 var showdown = require('showdown');
 
 var sd = new showdown.Converter();
@@ -15,11 +19,17 @@ sd.addExtension(function () {
     filter: function filter(text, converter, options) {
       var left = "<pre><code\\b[^>]*>",
           right = "</code></pre>",
-          flags = "g";
-
-      var replacement = function replacement(wholeMatch, match, left, right) {
+          flags = "g",
+          replacement = function replacement(wholeMatch, match, left, right) {
+        match = decodeHtml(match);
         var lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
-        left = left.slice(0, 18) + 'hljs ' + left.slice(18);
+
+        if (left.includes(classAttr)) {
+          var attrIndex = left.indexOf(classAttr) + classAttr.length;
+          left = left.slice(0, attrIndex) + 'hljs ' + left.slice(attrIndex);
+        } else {
+          left = left.slice(0, -1) + ' class="hljs">';
+        }
 
         if (lang && hljs.getLanguage(lang)) {
           return left + hljs.highlight(lang, match).value + right;
@@ -266,6 +276,73 @@ var MdEditor = function MdEditor(props) {
     saveMDAndHTMLState(stateWithStyledBlock);
   };
 
+  var ulListStyleTransform = function ulListStyleTransform() {
+    var _getSelectionState6 = getSelectionState(),
+        textBeforeSelection = _getSelectionState6.textBeforeSelection,
+        selectedText = _getSelectionState6.selectedText,
+        textAfterSelection = _getSelectionState6.textAfterSelection;
+
+    var lines = selectedText.split("\n");
+
+    if (lines.length === 1) {
+      var selectedTextWithListStyle = textBeforeSelection + "* ";
+      var stateWithNewULList = selectedTextWithListStyle + textAfterSelection;
+      saveMDAndHTMLState(stateWithNewULList);
+      setTextAreaFocus(selectedTextWithListStyle.length);
+    } else {
+      var linesTransformed = lines.reduce(function (acc, currentLine, idx) {
+        if (idx === 1) {
+          var lineToAdd = acc !== "" ? "\n* ".concat(acc) : acc + "\n* ".concat(currentLine, " \n");
+          return lineToAdd;
+        } else {
+          var _lineToAdd = currentLine !== "" ? "\n*".concat(currentLine, " \n") : "";
+
+          return acc + _lineToAdd;
+        }
+      });
+
+      var _selectedTextWithListStyle = textBeforeSelection + linesTransformed;
+
+      var stateWithNewOLList = _selectedTextWithListStyle + textAfterSelection;
+      saveMDAndHTMLState(stateWithNewOLList);
+      setTextAreaFocus(_selectedTextWithListStyle.length);
+    }
+  };
+
+  var olListStyleTransform = function olListStyleTransform() {
+    var _getSelectionState7 = getSelectionState(),
+        textBeforeSelection = _getSelectionState7.textBeforeSelection,
+        selectedText = _getSelectionState7.selectedText,
+        textAfterSelection = _getSelectionState7.textAfterSelection;
+
+    var lines = selectedText.split("\n");
+
+    if (lines.length === 1) {
+      var selectedTextWithListStyle = textBeforeSelection + "1. ".concat(lines[0]);
+      var stateWithNewOLList = selectedTextWithListStyle + textAfterSelection;
+      saveMDAndHTMLState(stateWithNewOLList);
+      setTextAreaFocus(selectedTextWithListStyle.length);
+    } else {
+      var linesTransformed = lines.reduce(function (acc, currentLine, idx) {
+        if (idx === 1) {
+          var lineToAdd = acc !== "" ? "\n".concat(idx, ". ").concat(acc, "\n") : acc + "\n".concat(idx, ". ").concat(currentLine, " \n");
+          return lineToAdd;
+        } else {
+          var _lineToAdd2 = currentLine !== "" ? "\n".concat(idx, ". ").concat(currentLine, " \n") : "";
+
+          return acc + _lineToAdd2;
+        }
+      });
+
+      var _selectedTextWithListStyle2 = textBeforeSelection + linesTransformed;
+
+      var _stateWithNewOLList = _selectedTextWithListStyle2 + textAfterSelection;
+
+      saveMDAndHTMLState(_stateWithNewOLList);
+      setTextAreaFocus(_selectedTextWithListStyle2.length);
+    }
+  };
+
   var onSelectControl = function onSelectControl(evt) {
     var control = evt.currentTarget.value;
 
@@ -320,15 +397,13 @@ var MdEditor = function MdEditor(props) {
 
       case 'OL':
         {
-          console.log('handle ol'); // transform(control);
-
+          olListStyleTransform();
           break;
         }
 
       case 'UL':
         {
-          console.log('handle ul'); // transform(control);
-
+          ulListStyleTransform();
           break;
         }
 

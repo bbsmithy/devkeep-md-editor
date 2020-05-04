@@ -33,7 +33,7 @@ const App = () => {
   };
 
   return (
-    <div style={{ margin: 'auto', width: '80%' }}>
+    <div style={{ margin: 'auto', width: '60%' }}>
       <MarkdownEditor
         height={700}
         initialContent={{ type: 'md', content: exmapleMD }}
