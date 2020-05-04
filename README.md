@@ -11,7 +11,7 @@ CMD+S to run save returning html and markdown
 
 CMD+D to for delete control
 
-```javascript
+```js
 import React from 'react';
 import { render } from 'react-dom';
 import { MarkdownEditor } from './lib';
