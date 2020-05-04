@@ -17,10 +17,11 @@ sd.addExtension(function () {
   return [{
     type: "output",
     filter: function filter(text, converter, options) {
-      var left = "<pre><code\\b[^>]*>",
-          right = "</code></pre>",
-          flags = "g",
-          replacement = function replacement(wholeMatch, match, left, right) {
+      var left = "<pre><code\\b[^>]*>";
+      var right = "</code></pre>";
+      var flags = "g";
+
+      var replacement = function replacement(wholeMatch, match, left, right) {
         match = decodeHtml(match);
         var lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
 
@@ -71,6 +72,11 @@ var MdEditor = function MdEditor(props) {
     setInitialContent();
   }, []);
   React.useEffect(function () {
+    if (!displayMD) {
+      var htmlToDisplay = createHTML(md);
+      setHTML(htmlToDisplay);
+    }
+
     setTextAreaFocus(md.length);
     document.addEventListener('keydown', commandListener);
     return function () {
@@ -191,8 +197,6 @@ var MdEditor = function MdEditor(props) {
   };
 
   var saveMDAndHTMLState = function saveMDAndHTMLState(markdown) {
-    var html = createHTML(markdown);
-    setHTML(html);
     setMD(markdown);
   };
 
