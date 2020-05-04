@@ -6,7 +6,13 @@ const styles = {
   mainContainer: { backgroundColor: '#333' },
   markdownContainer: { color: 'white' },
   markdownEditor: { backgroundColor: '#333', color: 'white' },
-  htmlContainer: { color: 'white' }
+  htmlContainer: { color: 'white' },
+  controlsContainer: {
+    backgroundColor: ''
+  },
+  controlButton: {
+    backgroundColor: '#333'
+  }
 };
 
 const exmapleMD = `# Hello
@@ -27,7 +33,7 @@ const App = () => {
   };
 
   return (
-    <div style={{ margin: 'auto', width: '50%' }}>
+    <div style={{ margin: 'auto', width: '80%' }}>
       <MarkdownEditor
         height={700}
         initialContent={{ type: 'md', content: exmapleMD }}

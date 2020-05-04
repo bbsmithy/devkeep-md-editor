@@ -4,28 +4,36 @@ import 'highlight.js/styles/a11y-dark.css';
 import Controls from './Controls';
 import './MarkdownEditor.css';
 
+const decodeHtml = require("html-encoder-decoder").decode
+const classAttr = 'class="';
 const showdown = require('showdown');
-
 const sd = new showdown.Converter();
-
-
-
 sd.addExtension(() => {
   return [{
     type: "output",
-    filter: function (text, converter, options) {
-      var left = "<pre><code\\b[^>]*>",
-        right = "</code></pre>",
-        flags = "g";
-      var replacement = function (wholeMatch, match, left, right) {
-        var lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
-        left = left.slice(0, 18) + 'hljs ' + left.slice(18);
-        if (lang && hljs.getLanguage(lang)) {
-          return left + hljs.highlight(lang, match).value + right;
-        } else {
-          return left + hljs.highlightAuto(match).value + right;
+    filter(text, converter, options) {
+      let left = "<pre><code\\b[^>]*>"
+        , right = "</code></pre>"
+        , flags = "g"
+        , replacement = (wholeMatch, match, left, right) => {
+          match = decodeHtml(match);
+          let lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
+
+          if (left.includes(classAttr)) {
+            let attrIndex = left.indexOf(classAttr) + classAttr.length;
+            left = left.slice(0, attrIndex) + 'hljs ' + left.slice(attrIndex);
+          } else {
+            left = left.slice(0, -1) + ' class="hljs">';
+          }
+
+          if (lang && hljs.getLanguage(lang)) {
+            return left + hljs.highlight(lang, match).value + right;
+          } else {
+            return left + hljs.highlightAuto(match).value + right;
+          }
         }
-      };
+        ;
+
       return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
     }
   }];
@@ -244,6 +252,68 @@ const MdEditor = props => {
     saveMDAndHTMLState(stateWithStyledBlock);
   };
 
+  const ulListStyleTransform = () => {
+    const {
+      textBeforeSelection,
+      selectedText,
+      textAfterSelection
+    } = getSelectionState();
+
+    const lines = selectedText.split("\n");
+    if (lines.length === 1) {
+      const selectedTextWithListStyle = textBeforeSelection + "* ";
+      const stateWithNewULList = selectedTextWithListStyle + textAfterSelection;
+      saveMDAndHTMLState(stateWithNewULList);
+      setTextAreaFocus(selectedTextWithListStyle.length);
+    } else {
+      const linesTransformed = lines.reduce((acc, currentLine, idx) => {
+        if (idx === 1) {
+          const lineToAdd = acc !== "" ? `\n* ${acc}` : acc + `\n* ${currentLine} \n`;
+          return lineToAdd
+        } else {
+          const lineToAdd = currentLine !== "" ? `\n*${currentLine} \n` : ""
+          return acc + lineToAdd;
+        }
+      })
+      const selectedTextWithListStyle = textBeforeSelection + linesTransformed;
+      const stateWithNewOLList = selectedTextWithListStyle + textAfterSelection;
+      saveMDAndHTMLState(stateWithNewOLList);
+      setTextAreaFocus(selectedTextWithListStyle.length);
+    }
+
+  }
+
+  const olListStyleTransform = () => {
+    const {
+      textBeforeSelection,
+      selectedText,
+      textAfterSelection
+    } = getSelectionState();
+
+    const lines = selectedText.split("\n");
+
+    if (lines.length === 1) {
+      const selectedTextWithListStyle = textBeforeSelection + `1. ${lines[0]}`;
+      const stateWithNewOLList = selectedTextWithListStyle + textAfterSelection;
+      saveMDAndHTMLState(stateWithNewOLList);
+      setTextAreaFocus(selectedTextWithListStyle.length);
+    } else {
+      const linesTransformed = lines.reduce((acc, currentLine, idx) => {
+        if (idx === 1) {
+          const lineToAdd = acc !== "" ? `\n${idx}. ${acc}\n` : acc + `\n${idx}. ${currentLine} \n`;
+          return lineToAdd
+        } else {
+          const lineToAdd = currentLine !== "" ? `\n${idx}. ${currentLine} \n` : ""
+          return acc + lineToAdd;
+        }
+      })
+      const selectedTextWithListStyle = textBeforeSelection + linesTransformed;
+      const stateWithNewOLList = selectedTextWithListStyle + textAfterSelection;
+      saveMDAndHTMLState(stateWithNewOLList);
+      setTextAreaFocus(selectedTextWithListStyle.length);
+    }
+  }
+
   const onSelectControl = evt => {
     const control = evt.currentTarget.value;
 
@@ -281,13 +351,11 @@ const MdEditor = props => {
         break;
       }
       case 'OL': {
-        console.log('handle ol');
-        // transform(control);
+        olListStyleTransform();
         break;
       }
       case 'UL': {
-        console.log('handle ul');
-        // transform(control);
+        ulListStyleTransform();
         break;
       }
       default: {

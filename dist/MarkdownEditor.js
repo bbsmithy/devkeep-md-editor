@@ -1,14 +1,36 @@
 import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
 import * as React from 'react';
-import './MarkdownEditor.css';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/a11y-dark.css';
 import Controls from './Controls';
+import './MarkdownEditor.css';
 
-var MarkdownIt = require('markdown-it');
+var showdown = require('showdown');
 
-var mdIt = new MarkdownIt({
-  html: true // Enable HTML tags in source
+var sd = new showdown.Converter();
+sd.addExtension(function () {
+  return [{
+    type: "output",
+    filter: function filter(text, converter, options) {
+      var left = "<pre><code\\b[^>]*>",
+          right = "</code></pre>",
+          flags = "g";
 
+      var replacement = function replacement(wholeMatch, match, left, right) {
+        var lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
+        left = left.slice(0, 18) + 'hljs ' + left.slice(18);
+
+        if (lang && hljs.getLanguage(lang)) {
+          return left + hljs.highlight(lang, match).value + right;
+        } else {
+          return left + hljs.highlightAuto(match).value + right;
+        }
+      };
+
+      return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
+    }
+  }];
 });
 var codeBackTicks = '```';
 
@@ -36,12 +58,31 @@ var MdEditor = function MdEditor(props) {
       setCodeLang = _React$useState8[1];
 
   React.useEffect(function () {
+    setInitialContent();
+  }, []);
+  React.useEffect(function () {
     setTextAreaFocus(md.length);
     document.addEventListener('keydown', commandListener);
     return function () {
       return document.removeEventListener('keydown', commandListener);
     };
   }, [displayMD]);
+
+  var setInitialContent = function setInitialContent() {
+    var _props$initialContent = props.initialContent,
+        type = _props$initialContent.type,
+        content = _props$initialContent.content;
+
+    if (type === 'html') {
+      setHTML(content);
+      var newMarkdown = sd.makeMarkdown(content);
+      setMD(newMarkdown);
+    } else if (type === 'md') {
+      setMD(content);
+      var newHtml = sd.makeHtml(content);
+      setHTML(newHtml);
+    }
+  };
 
   var setTextAreaFocus = function setTextAreaFocus(selectionEnd) {
     if (textarea.current) {
@@ -146,7 +187,7 @@ var MdEditor = function MdEditor(props) {
   };
 
   var createHTML = function createHTML(markdown) {
-    return mdIt.render(markdown);
+    return sd.makeHtml(markdown);
   };
 
   var onChangeMarkdown = function onChangeMarkdown(evt) {
@@ -208,7 +249,7 @@ var MdEditor = function MdEditor(props) {
 
     var selectedTextWithQuoteBlock = '';
     selectedText.split('\n').forEach(function (line) {
-      selectedTextWithQuoteBlock += "> ".concat(line, " \n");
+      selectedTextWithQuoteBlock += ">".concat(line, " \n");
     });
     var stateWithQuoteBlock = textBeforeSelection + selectedTextWithQuoteBlock + textAfterSelection;
     saveMDAndHTMLState(stateWithQuoteBlock);
@@ -277,12 +318,6 @@ var MdEditor = function MdEditor(props) {
           break;
         }
 
-      case 'UNDERLINE':
-        {
-          // underlineTransform();
-          break;
-        }
-
       case 'OL':
         {
           console.log('handle ol'); // transform(control);
@@ -299,7 +334,7 @@ var MdEditor = function MdEditor(props) {
 
       default:
         {
-          console.log('NO CONTROL'); // transform(control);
+          console.log('NO CONTROL');
         }
     }
   };
@@ -326,14 +361,13 @@ var MdEditor = function MdEditor(props) {
     onChange: onChangeMarkdown,
     value: md,
     ref: textarea
-  })), !displayMD && React.createElement("div", {
+  })), !displayMD && html && React.createElement("div", {
     className: "htmlContainer",
-    style: props.styles.htmlContainer
-  }, html && React.createElement("div", {
+    style: props.styles.htmlContainer,
     dangerouslySetInnerHTML: {
       __html: html
     }
-  }))));
+  })));
 };
 
 export default MdEditor;
