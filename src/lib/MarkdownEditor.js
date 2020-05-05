@@ -372,12 +372,15 @@ const MdEditor = props => {
     <>
       {displayMD && (
         <Controls
+          buttonStyle={props.styles.btn}
+          langStyle={props.styles.langInput}
+          controlsContainer={props.styles.controlsContainer}
           onSelectControl={onSelectControl}
           onChangeLanguage={onChangeLanguage}
         />
       )}
       <div
-        className='mainContainer'
+        id='devkeepEditorMainContainer'
         style={{
           height: props.height,
           ...props.styles.mainContainer

@@ -7,13 +7,25 @@ const styles = {
   markdownContainer: { color: 'white' },
   markdownEditor: { backgroundColor: '#333', color: 'white' },
   htmlContainer: { color: 'white' },
-  controlsContainer: {
-    backgroundColor: ''
+  controlsContainer: {},
+  langInput: {
+    color: 'white',
+    backgroundColor: '#333',
+    height: 20,
+    borderRadius: 4,
+    width: 60,
+    padding: 4,
+    border: 'none'
   },
-  controlButton: {
-    backgroundColor: '#333'
+  btn: {
+    backgroundColor: '#333',
+    color: 'white',
+    padding: "3px 10px 3px 10px",
+    fontSize: 12,
+    borderRadius: 4,
+    height: 30
   }
-};
+}
 
 const exmapleMD = `# Hello
 

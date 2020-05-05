@@ -1,45 +1,56 @@
-.mainContainer {
+#devkeepEditorMainContainer {
   width: 100%;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.markdownContainer {
+#devkeepEditorMainContainer .markdownContainer {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
-.htmlContainer {
+#devkeepEditorMainContainer .htmlContainer {
   width: 100%;
   height: 100%;
   overflow: auto;
 }
-
-.markdownEditor {
+#devkeepEditorMainContainer .markdownContainer{
   width: 100%;
   height: 100%;
+  overflow: hidden;
+}
+
+#devkeepEditorMainContainer .markdownEditor {
+  width: 98%;
+  height: 100%;
+  margin: auto;
+  padding: 1%;
   font-size: 14px;
-  padding: 10px;
   border: none;
   resize: none;
-  overflow: auto;
 }
 
-.markdownEditor:focus {
+#devkeepEditorMainContainer .markdownEditor:focus {
   outline: none;
 }
 
-.mainContainer h1, h2, h3, h4, p {
+#devkeepEditorMainContainer h1, h2, h3, h4, p {
   margin: 0;
   padding: 10px;
 }
 
-blockquote {
+#devkeepEditorMainContainer blockquote {
   background: #333;
   border-left: 5px solid #ccc;
   margin: 0.3em 10px;
   padding: 0.5em 0px 0.5em 10px;
   quotes: "\201C""\201D""\2018""\2019";
 }
-blockquote p {
+
+#devkeepEditorMainContainer blockquote p {
   display: inline;
+}
+
+#devkeepEditorMainContainer code {
+  font-size: 12px;
 }

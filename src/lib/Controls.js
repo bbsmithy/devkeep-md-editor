@@ -1,4 +1,10 @@
 import * as React from 'react';
+import { ReactComponent as CodeIcon } from '../assets/code-solid.svg';
+import { ReactComponent as BoldIcon } from '../assets/bold-solid.svg';
+import { ReactComponent as ItalicIcon } from '../assets/italic-solid.svg';
+import { ReactComponent as OLIcon } from '../assets/list-ol-solid.svg';
+import { ReactComponent as ULIcon } from '../assets/list-ul-solid.svg';
+import { ReactComponent as BlockQuoteIcon } from '../assets/quote-right-solid.svg';
 import './Controls.css';
 
 // H1 H2 H3 H4
@@ -20,41 +26,41 @@ const Controls = props => {
     props.onChangeLanguage(evt.target.value);
   };
   return (
-    <div className='controls-container'>
-      <button value='H1' onClick={props.onSelectControl}>
+    <div style={props.controlsContainer} className="controls-container">
+      <button value='H1' style={props.buttonStyle} onClick={props.onSelectControl}>
         H1
       </button>
-      <button value='H2' onClick={props.onSelectControl}>
+      <button value='H2' style={props.buttonStyle} onClick={props.onSelectControl}>
         H2
       </button>
-      <button value='H3' onClick={props.onSelectControl}>
+      <button value='H3' style={props.buttonStyle} onClick={props.onSelectControl}>
         H3
       </button>
-      <button value='H4' onClick={props.onSelectControl}>
+      <button value='H4' style={props.buttonStyle} onClick={props.onSelectControl}>
         H4
       </button>
-      <button value='CODE' onClick={props.onSelectControl}>
-        Code
+      <button value='CODE' style={props.buttonStyle} onClick={props.onSelectControl}>
+        <CodeIcon height={12} width={12} />
       </button>
       <input
-        placeholder='lang'
+        placeholder='Language'
         onChange={onChangeLanguage}
-        style={{ width: 50 }}
+        style={props.langStyle}
       />
-      <button value='BLOCKQUOTE' onClick={props.onSelectControl}>
-        Blockqoute
+      <button value='BLOCKQUOTE' style={props.buttonStyle} onClick={props.onSelectControl}>
+        <BlockQuoteIcon height={12} width={12} />
       </button>
-      <button value='BOLD' onClick={props.onSelectControl}>
-        Bold
+      <button value='BOLD' style={props.buttonStyle} onClick={props.onSelectControl}>
+        <BoldIcon height={12} width={12} />
       </button>
-      <button value='ITALIC' onClick={props.onSelectControl}>
-        Italic
+      <button value='ITALIC' style={props.buttonStyle} onClick={props.onSelectControl}>
+        <ItalicIcon height={12} width={12} />
       </button>
-      <button value='OL' onClick={props.onSelectControl}>
-        OL
+      <button value='OL' style={props.buttonStyle} onClick={props.onSelectControl}>
+        <OLIcon height={12} width={12} />
       </button>
-      <button value='UL' onClick={props.onSelectControl}>
-        UL
+      <button value='UL' style={props.buttonStyle} onClick={props.onSelectControl}>
+        <ULIcon height={12} width={12} />
       </button>
     </div>
   );
