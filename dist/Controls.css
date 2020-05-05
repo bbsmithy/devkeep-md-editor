@@ -1,19 +1,11 @@
-.controls-container {
-  padding-top: 5px;
-  padding-bottom: 5px;
+.controls-container button:focus {
+  outline: none;
+}
+
+.controls-container input:focus {
+  outline: none;
 }
 
 .controls-container button {
-  border-radius: 2px;
-  margin-right: 2px;
-  margin-left: 2px;
-}
-
-.controls-container input {
-  margin-right: 2px;
-  margin-left: 2px;
-}
-
-.controls-container button:focus {
-  outline: none;
+  cursor: pointer;
 }

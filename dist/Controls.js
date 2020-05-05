@@ -1,4 +1,10 @@
 import * as React from 'react';
+import { ReactComponent as CodeIcon } from './code-solid.svg';
+import { ReactComponent as BoldIcon } from './bold-solid.svg';
+import { ReactComponent as ItalicIcon } from './italic-solid.svg';
+import { ReactComponent as OLIcon } from './list-ol-solid.svg';
+import { ReactComponent as ULIcon } from './list-ul-solid.svg';
+import { ReactComponent as BlockQuoteIcon } from './quote-right-solid.svg';
 import './Controls.css'; // H1 H2 H3 H4
 // H1 -> # (TEXT)
 // H2 -> ## (TEXT)
@@ -18,44 +24,71 @@ var Controls = function Controls(props) {
   };
 
   return React.createElement("div", {
+    style: props.controlsContainer,
     className: "controls-container"
   }, React.createElement("button", {
     value: "H1",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
   }, "H1"), React.createElement("button", {
     value: "H2",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
   }, "H2"), React.createElement("button", {
     value: "H3",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
   }, "H3"), React.createElement("button", {
     value: "H4",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
   }, "H4"), React.createElement("button", {
     value: "CODE",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, "Code"), React.createElement("input", {
-    placeholder: "lang",
+  }, React.createElement(CodeIcon, {
+    height: 12,
+    width: 12
+  })), React.createElement("input", {
+    placeholder: "Language",
     onChange: onChangeLanguage,
-    style: {
-      width: 50
-    }
+    style: props.langStyle
   }), React.createElement("button", {
     value: "BLOCKQUOTE",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, "Blockqoute"), React.createElement("button", {
+  }, React.createElement(BlockQuoteIcon, {
+    height: 12,
+    width: 12
+  })), React.createElement("button", {
     value: "BOLD",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, "Bold"), React.createElement("button", {
+  }, React.createElement(BoldIcon, {
+    height: 12,
+    width: 12
+  })), React.createElement("button", {
     value: "ITALIC",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, "Italic"), React.createElement("button", {
+  }, React.createElement(ItalicIcon, {
+    height: 12,
+    width: 12
+  })), React.createElement("button", {
     value: "OL",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, "OL"), React.createElement("button", {
+  }, React.createElement(OLIcon, {
+    height: 12,
+    width: 12
+  })), React.createElement("button", {
     value: "UL",
+    style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, "UL"));
+  }, React.createElement(ULIcon, {
+    height: 12,
+    width: 12
+  })));
 };
 
 export default Controls;

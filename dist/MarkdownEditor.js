@@ -423,10 +423,13 @@ var MdEditor = function MdEditor(props) {
   };
 
   return React.createElement(React.Fragment, null, displayMD && React.createElement(Controls, {
+    buttonStyle: props.styles.btn,
+    langStyle: props.styles.langInput,
+    controlsContainer: props.styles.controlsContainer,
     onSelectControl: onSelectControl,
     onChangeLanguage: onChangeLanguage
   }), React.createElement("div", {
-    className: "mainContainer",
+    id: "devkeepEditorMainContainer",
     style: _objectSpread({
       height: props.height
     }, props.styles.mainContainer)

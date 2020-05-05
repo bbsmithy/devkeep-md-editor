@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { ReactComponent as CodeIcon } from '../assets/code-solid.svg';
-import { ReactComponent as BoldIcon } from '../assets/bold-solid.svg';
-import { ReactComponent as ItalicIcon } from '../assets/italic-solid.svg';
-import { ReactComponent as OLIcon } from '../assets/list-ol-solid.svg';
-import { ReactComponent as ULIcon } from '../assets/list-ul-solid.svg';
-import { ReactComponent as BlockQuoteIcon } from '../assets/quote-right-solid.svg';
+import { ReactComponent as CodeIcon } from './code-solid.svg';
+import { ReactComponent as BoldIcon } from './bold-solid.svg';
+import { ReactComponent as ItalicIcon } from './italic-solid.svg';
+import { ReactComponent as OLIcon } from './list-ol-solid.svg';
+import { ReactComponent as ULIcon } from './list-ul-solid.svg';
+import { ReactComponent as BlockQuoteIcon } from './quote-right-solid.svg';
 import './Controls.css';
 
 // H1 H2 H3 H4
