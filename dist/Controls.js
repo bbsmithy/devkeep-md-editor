@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { ReactComponent as CodeIcon } from './code-solid.svg';
-import { ReactComponent as BoldIcon } from './bold-solid.svg';
-import { ReactComponent as ItalicIcon } from './italic-solid.svg';
-import { ReactComponent as OLIcon } from './list-ol-solid.svg';
-import { ReactComponent as ULIcon } from './list-ul-solid.svg';
-import { ReactComponent as BlockQuoteIcon } from './quote-right-solid.svg';
+import CodeIcon from './code-solid.svg';
+import BoldIcon from './bold-solid.svg';
+import ItalicIcon from './italic-solid.svg';
+import OLIcon from './list-ol-solid.svg';
+import ULIcon from './list-ul-solid.svg';
+import BlockQuoteIcon from './quote-right-solid.svg';
 import './Controls.css'; // H1 H2 H3 H4
 // H1 -> # (TEXT)
 // H2 -> ## (TEXT)
@@ -46,7 +46,8 @@ var Controls = function Controls(props) {
     value: "CODE",
     style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, React.createElement(CodeIcon, {
+  }, React.createElement("img", {
+    src: CodeIcon,
     height: 12,
     width: 12
   })), React.createElement("input", {
@@ -57,35 +58,40 @@ var Controls = function Controls(props) {
     value: "BLOCKQUOTE",
     style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, React.createElement(BlockQuoteIcon, {
+  }, React.createElement("img", {
+    src: BlockQuoteIcon,
     height: 12,
     width: 12
   })), React.createElement("button", {
     value: "BOLD",
     style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, React.createElement(BoldIcon, {
+  }, React.createElement("img", {
+    src: BoldIcon,
     height: 12,
     width: 12
   })), React.createElement("button", {
     value: "ITALIC",
     style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, React.createElement(ItalicIcon, {
+  }, React.createElement("img", {
+    src: ItalicIcon,
     height: 12,
     width: 12
   })), React.createElement("button", {
     value: "OL",
     style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, React.createElement(OLIcon, {
+  }, React.createElement("img", {
+    src: OLIcon,
     height: 12,
     width: 12
   })), React.createElement("button", {
     value: "UL",
     style: props.buttonStyle,
     onClick: props.onSelectControl
-  }, React.createElement(ULIcon, {
+  }, React.createElement("img", {
+    src: ULIcon,
     height: 12,
     width: 12
   })));

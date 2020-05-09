@@ -1,11 +1,12 @@
-import * as React from 'react';
+import React from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/a11y-dark.css';
 import Controls from './Controls';
-import './MarkdownEditor.css';
+import { createUseStyles } from 'react-jss';
 
 const decodeHtml = require("html-encoder-decoder").decode
 const classAttr = 'class="';
+const codeBackTicks = '```';
 const showdown = require('showdown');
 const sd = new showdown.Converter();
 sd.addExtension(() => {
@@ -37,7 +38,57 @@ sd.addExtension(() => {
   }];
 })
 
-const codeBackTicks = '```';
+const useStyles = createUseStyles(() => ({
+  mainContainer: {
+    width: '100%',
+    fontFamily: 'Arial, Helvetica, sans-serif',
+    '& h1, h2, h3, h4, h5, p': {
+      margin: 0,
+      padding: 10
+    },
+    '& blockquote': {
+      background: '#333',
+      borderLeft: '5px solid #ccc',
+      margin: '0.3em 10px',
+      padding: '0.5em 0px 0.5em 10px',
+      '& p': {
+        display: 'inline'
+      }
+    },
+    '& code': {
+      '& span': {
+        lineHeight: 1.3
+      }
+    }
+  },
+  markdownContainer: {
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden'
+  },
+  htmlContainer: {
+    width: '100%',
+    height: '100%',
+    overflow: 'auto',
+    '& img': {
+      maxWidth: '100%'
+    }
+  },
+  markdownEditor: {
+    width: '98%',
+    height: '100%',
+    margin: 'auto',
+    padding: '1%',
+    fontSize: 14,
+    border: 'none',
+    resize: 'none',
+    '&:focus': {
+      outline: 'none'
+    }
+  }
+}))
+
+
 
 const MdEditor = props => {
   const [html, setHTML] = React.useState();
@@ -45,6 +96,8 @@ const MdEditor = props => {
   const [displayMD, setDisplayMD] = React.useState(true);
   const textarea = React.useRef(null);
   const [codeLang, setCodeLang] = React.useState('');
+
+  const classes = useStyles();
 
   React.useEffect(() => {
     setInitialContent();
@@ -373,14 +426,13 @@ const MdEditor = props => {
       {displayMD && (
         <Controls
           buttonStyle={props.styles.btn}
-          langStyle={props.styles.langInput}
           controlsContainer={props.styles.controlsContainer}
           onSelectControl={onSelectControl}
           onChangeLanguage={onChangeLanguage}
         />
       )}
       <div
-        id='devkeepEditorMainContainer'
+        className={classes.mainContainer}
         style={{
           height: props.height,
           ...props.styles.mainContainer
@@ -388,11 +440,11 @@ const MdEditor = props => {
       >
         {displayMD && (
           <div
-            className='markdownContainer'
+            className={classes.markdownContainer}
             style={props.styles.markdownContainer}
           >
             <textarea
-              className='markdownEditor'
+              className={classes.markdownEditor}
               id='devkeep-md-textarea'
               style={props.styles.markdownEditor}
               onChange={onChangeMarkdown}
@@ -402,7 +454,7 @@ const MdEditor = props => {
           </div>
         )}
         {!displayMD && html && (
-          <div className='htmlContainer' style={props.styles.htmlContainer} dangerouslySetInnerHTML={{ __html: html }}></div>
+          <div className={classes.htmlContainer} style={props.styles.htmlContainer} dangerouslySetInnerHTML={{ __html: html }}></div>
         )}
       </div>
     </>

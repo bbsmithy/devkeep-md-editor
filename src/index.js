@@ -8,20 +8,11 @@ const styles = {
   markdownEditor: { backgroundColor: '#333', color: 'white' },
   htmlContainer: { color: 'white' },
   controlsContainer: {},
-  langInput: {
-    color: 'white',
-    backgroundColor: '#333',
-    height: 20,
-    borderRadius: 4,
-    width: 60,
-    padding: 4,
-    border: 'none'
-  },
   btn: {
     backgroundColor: '#333',
     color: 'white',
     padding: "3px 10px 3px 10px",
-    fontSize: 12,
+    fontSize: 14,
     borderRadius: 4,
     height: 30
   }
