@@ -5,6 +5,10 @@ The plan is to keep it very simple starting out with heading controls, code bloc
 
 The markdown parser i'm using is [showdown](https://github.com/showdownjs/showdown), so anything you can do with that you should be able to do here.
 
+To specify the initialContent type 'html' or 'md' type and then pass content:
+
+```js { type: 'md', content: exmapleMD }```
+
 CMD+K toggle between markdown and rendered html
 
 CMD+S to run save returning html and markdown
