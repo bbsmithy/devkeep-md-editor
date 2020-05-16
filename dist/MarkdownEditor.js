@@ -100,12 +100,12 @@ var MdEditor = function MdEditor(props) {
   var _React$useState = React.useState(),
       _React$useState2 = _slicedToArray(_React$useState, 2),
       html = _React$useState2[0],
-      setHTML = _React$useState2[1];
+      _setHTML = _React$useState2[1];
 
   var _React$useState3 = React.useState(''),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
       md = _React$useState4[0],
-      setMD = _React$useState4[1];
+      _setMD = _React$useState4[1];
 
   var _React$useState5 = React.useState(true),
       _React$useState6 = _slicedToArray(_React$useState5, 2),
@@ -113,12 +113,8 @@ var MdEditor = function MdEditor(props) {
       setDisplayMD = _React$useState6[1];
 
   var textarea = React.useRef(null);
-
-  var _React$useState7 = React.useState(''),
-      _React$useState8 = _slicedToArray(_React$useState7, 2),
-      codeLang = _React$useState8[0],
-      setCodeLang = _React$useState8[1];
-
+  var mdRef = React.useRef(md);
+  var htmlRef = React.useRef(html);
   var classes = useStyles();
   React.useEffect(function () {
     setInitialContent();
@@ -135,6 +131,18 @@ var MdEditor = function MdEditor(props) {
       return document.removeEventListener('keydown', commandListener);
     };
   }, [displayMD]);
+
+  var setMD = function setMD(data) {
+    mdRef.current = data;
+
+    _setMD(data);
+  };
+
+  var setHTML = function setHTML(data) {
+    htmlRef.current = data;
+
+    _setHTML(data);
+  };
 
   var setInitialContent = function setInitialContent() {
     var _props$initialContent = props.initialContent,
@@ -180,7 +188,9 @@ var MdEditor = function MdEditor(props) {
     switch (keyCode) {
       case 83:
         {
-          props.onSave(md, html);
+          var htmlToSave = createHTML(mdRef.current);
+          props.onSave(mdRef.current, htmlToSave);
+          setHTML(htmlToSave);
           break;
         }
 
@@ -301,7 +311,7 @@ var MdEditor = function MdEditor(props) {
         selectedText = _getSelectionState3.selectedText,
         textAfterSelection = _getSelectionState3.textAfterSelection;
 
-    var selectedTextAsCodeBlock = "".concat(codeBackTicks).concat(codeLang) + '\n' + selectedText + '\n' + "".concat(codeBackTicks);
+    var selectedTextAsCodeBlock = "".concat(codeBackTicks) + '\n' + selectedText + '\n' + "".concat(codeBackTicks);
     console.log(selectedText);
     var stateWithCodeBlock = textBeforeSelection + selectedTextAsCodeBlock + textAfterSelection;
     saveMDAndHTMLState(stateWithCodeBlock);
@@ -470,15 +480,10 @@ var MdEditor = function MdEditor(props) {
     }
   };
 
-  var onChangeLanguage = function onChangeLanguage(lang) {
-    setCodeLang(lang);
-  };
-
   return React.createElement(React.Fragment, null, displayMD && React.createElement(Controls, {
     buttonStyle: props.styles.btn,
     controlsContainer: props.styles.controlsContainer,
-    onSelectControl: onSelectControl,
-    onChangeLanguage: onChangeLanguage
+    onSelectControl: onSelectControl
   }), React.createElement("div", {
     className: classes.mainContainer,
     style: _objectSpread({
