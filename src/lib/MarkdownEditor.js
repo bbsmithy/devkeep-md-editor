@@ -88,14 +88,13 @@ const useStyles = createUseStyles(() => ({
   }
 }))
 
-
-
 const MdEditor = props => {
-  const [html, setHTML] = React.useState();
-  const [md, setMD] = React.useState('');
+  const [html, _setHTML] = React.useState();
+  const [md, _setMD] = React.useState('');
   const [displayMD, setDisplayMD] = React.useState(true);
   const textarea = React.useRef(null);
-  const [codeLang, setCodeLang] = React.useState('');
+  const mdRef = React.useRef(md);
+  const htmlRef = React.useRef(html);
 
   const classes = useStyles();
 
@@ -112,6 +111,17 @@ const MdEditor = props => {
     document.addEventListener('keydown', commandListener);
     return () => document.removeEventListener('keydown', commandListener);
   }, [displayMD]);
+
+
+  const setMD = (data) => {
+    mdRef.current = data;
+    _setMD(data);
+  }
+
+  const setHTML = (data) => {
+    htmlRef.current = data;
+    _setHTML(data);
+  }
 
   const setInitialContent = () => {
     const { type, content } = props.initialContent
@@ -154,7 +164,9 @@ const MdEditor = props => {
   const cmdAction = keyCode => {
     switch (keyCode) {
       case 83: {
-        props.onSave(md, html);
+        const htmlToSave = createHTML(mdRef.current);
+        props.onSave(mdRef.current, htmlToSave);
+        setHTML(htmlToSave);
         break;
       }
       case 68: {
@@ -266,7 +278,7 @@ const MdEditor = props => {
       textAfterSelection
     } = getSelectionState();
     const selectedTextAsCodeBlock =
-      `${codeBackTicks}${codeLang}` +
+      `${codeBackTicks}` +
       '\n' +
       selectedText +
       '\n' +
@@ -417,10 +429,6 @@ const MdEditor = props => {
     }
   };
 
-  const onChangeLanguage = lang => {
-    setCodeLang(lang);
-  };
-
   return (
     <>
       {displayMD && (
@@ -428,7 +436,6 @@ const MdEditor = props => {
           buttonStyle={props.styles.btn}
           controlsContainer={props.styles.controlsContainer}
           onSelectControl={onSelectControl}
-          onChangeLanguage={onChangeLanguage}
         />
       )}
       <div
