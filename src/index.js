@@ -21,6 +21,7 @@ Additionally, if you are the sort of person who wants to understand how things w
 `
 
 const theme = { background: "#333", color: "white" }
+const toolbarTheme = { background: "#333", color: "white", activeBtnBackground: "#242020", activeBtnColor: 'white' }
 
 const App = () => {
 
@@ -46,7 +47,7 @@ const App = () => {
         localSaveId="devkeep-save-1"
         editorTheme={theme}
         previewTheme={theme}
-        toolbarTheme={theme}
+        toolbarTheme={toolbarTheme}
       />
     </div>
   );

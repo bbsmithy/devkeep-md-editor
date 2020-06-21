@@ -102,6 +102,12 @@ const MarkdownEditor = (props) => {
         background-color: ${previewTheme.background} !important;
         color: ${previewTheme.color} !important;
       }
+      .editor-preview h1, h2 {
+        border-bottom: 1px solid ${previewTheme.color};
+      }
+      .editor-preview.fullscreen h1, h2 {
+        border-bottom: 1px solid ${previewTheme.color};
+      }
       .editor-toolbar {
         background-color: ${toolbarTheme.background} !important;
         color: ${toolbarTheme.color} !important;
@@ -112,6 +118,17 @@ const MarkdownEditor = (props) => {
       }
       .editor-toolbar a {
         color: ${toolbarTheme.color} !important;
+      }
+      .editor-toolbar a.active {
+        color: ${toolbarTheme.activeBtnColor} !important;
+        background: ${toolbarTheme.activeBtnBackground} !important;
+      }
+      .editor-toolbar.fullscreen a {
+        color: ${toolbarTheme.color} !important;
+      }
+      .editor-toolbar.fullscreen a.active, a:hover {
+        color: ${toolbarTheme.activeBtnColor} !important;
+        background: ${toolbarTheme.activeBtnBackground} !important;
       }
       .CodeMirror {
         background-color: ${editorTheme.background} !important;
