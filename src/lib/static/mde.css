@@ -570,7 +570,8 @@
   }
   
   .editor-preview-active-side {
-      display: block
+      display: block;
+      right: 0;
   }
   
   .editor-preview-active {
@@ -584,7 +585,6 @@
   
   .editor-preview pre,
   .editor-preview-side pre {
-      background: #eee;
       margin-bottom: 10px;
   }
   

@@ -79,60 +79,76 @@ const MarkdownEditor = (props) => {
       },
       styleSelectedText: true,
     })
+    console.log("Apply styles");
     applyStyleOptions();
   }
 
   const applyStyleOptions = () => {
-    const { editorTheme, previewTheme, toolbarTheme } = props;
+    const { theme: { editor, preview, toolbar, cursorColor } } = props;
     const customThemeStyle = document.createElement('style');
     customThemeStyle.innerHTML = `
+      .editor-preview-side pre {
+        background: ${preview.codeBlockBackground};
+        padding: 5px
+      }
       .editor-preview-side {
-        background-color: ${previewTheme.background} !important;
-        color: ${previewTheme.color} !important;
+        background-color: ${preview.background} !important;
+        color: ${preview.color} !important;
       }
       .editor-preview-side.fullscreen {
-        background-color: ${previewTheme.background} !important;
-        color: ${previewTheme.color} !important;
+        background-color: ${preview.background} !important;
+        color: ${preview.color} !important;
       }
       .editor-preview {
-        background-color: ${previewTheme.background} !important;
-        color: ${previewTheme.color} !important;
+        background-color: ${preview.background} !important;
+        color: ${preview.color} !important;
+      }
+      .editor-preview pre {
+        background: ${preview.codeBlockBackground};
+        padding: 5px
       }
       .editor-preview.fullscreen {
-        background-color: ${previewTheme.background} !important;
-        color: ${previewTheme.color} !important;
+        background-color: ${preview.background} !important;
+        color: ${preview.color} !important;
       }
       .editor-preview h1, h2 {
-        border-bottom: 1px solid ${previewTheme.color};
+        border-bottom: 1px solid ${preview.color};
       }
       .editor-preview.fullscreen h1, h2 {
-        border-bottom: 1px solid ${previewTheme.color};
+        border-bottom: 1px solid ${preview.color};
       }
       .editor-toolbar {
-        background-color: ${toolbarTheme.background} !important;
-        color: ${toolbarTheme.color} !important;
+        background-color: ${toolbar.background} !important;
+        color: ${toolbar.color} !important;
       }
       .editor-toolbar.fullscreen {
-        background-color: ${toolbarTheme.background} !important;
-        color: ${toolbarTheme.color} !important;
+        background-color: ${toolbar.background} !important;
+        color: ${toolbar.color} !important;
       }
       .editor-toolbar a {
-        color: ${toolbarTheme.color} !important;
+        color: ${toolbar.color} !important;
       }
       .editor-toolbar a.active {
-        color: ${toolbarTheme.activeBtnColor} !important;
-        background: ${toolbarTheme.activeBtnBackground} !important;
+        color: ${toolbar.activeBtnColor} !important;
+        background: ${toolbar.activeBtnBackground} !important;
       }
       .editor-toolbar.fullscreen a {
-        color: ${toolbarTheme.color} !important;
+        color: ${toolbar.color} !important;
       }
       .editor-toolbar.fullscreen a.active, a:hover {
-        color: ${toolbarTheme.activeBtnColor} !important;
-        background: ${toolbarTheme.activeBtnBackground} !important;
+        color: ${toolbar.activeBtnColor} !important;
+        background: ${toolbar.activeBtnBackground} !important;
+      }
+      .editor-toolbar.disabled-for-preview a:not(.no-disable) {
+        color: ${toolbar.disabledBtnColor} !important;
+        background: ${toolbar.disabledBtnBackground} !important;
       }
       .CodeMirror {
-        background-color: ${editorTheme.background} !important;
-        color: ${editorTheme.color} !important;
+        background-color: ${editor.background} !important;
+        color: ${editor.color} !important;
+      }
+      .CodeMirror-cursor {
+        border-left: 1px solid ${cursorColor} !important;
       }
     `
     const header = document.getElementsByTagName('head')[0];
@@ -189,9 +205,9 @@ MarkdownEditor.propTypes = {
   initialValue: PropTypes.string,
   localSaveId: PropTypes.string,
   spellChecker: PropTypes.bool,
-  editorTheme: PropTypes.object,
-  previewTheme: PropTypes.object,
-  toolbarTheme: PropTypes.object
+  editor: PropTypes.object,
+  preview: PropTypes.object,
+  toolbar: PropTypes.object
 }
 
 export default MarkdownEditor;
