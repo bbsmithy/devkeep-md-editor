@@ -18,11 +18,13 @@ const theme = {
     background: "#333",
     color: "white",
     activeBtnBackground: "#242020",
+    activeBtnColor: 'white',
     disabledBtnBackground: "gray",
     disabledBtnColor: '#333'
   },
-  preview: { background: "#4f4d4d", color: "white", codeBlockBackground: 'black' },
-  editor: { background: "#333", color: "white" }
+  preview: { background: "#4b4747", color: "white", codeBlockBackground: 'black' },
+  editor: { background: "#333", color: "white" },
+  cursorColor: "white",
 }
 
 const App = () => {
