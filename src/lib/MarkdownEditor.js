@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import SimpleMDE from "simplemde"
 import "./static/mde.css";
 import "./static/custom.css";
-import "./static/github-light.css";
 
 
 const keyCommands = [83, 69, 79];
@@ -13,7 +12,7 @@ let simplemde;
 
 const MarkdownEditor = (props) => {
 
-  const { onSave, onDelete, onOpenInsert, initialValue, localSaveId, spellChecker } = props;
+  const { onSave, onDelete, initialValue, localSaveId, useSpellChecker } = props;
 
   useEffect(() => {
     setUpSimpleMDE(initialValue);
@@ -60,7 +59,7 @@ const MarkdownEditor = (props) => {
           title: "Save",
         }
       ],
-      spellChecker: spellChecker,
+      spellChecker: useSpellChecker,
       initialValue,
       autofocus: true,
       shortcuts: {
@@ -79,12 +78,12 @@ const MarkdownEditor = (props) => {
       },
       styleSelectedText: true,
     })
-    console.log("Apply styles");
     applyStyleOptions();
   }
 
   const applyStyleOptions = () => {
     const { theme: { editor, preview, toolbar, cursorColor } } = props;
+    const header = document.getElementsByTagName('head')[0];
     const customThemeStyle = document.createElement('style');
     customThemeStyle.innerHTML = `
       .editor-preview-side pre {
@@ -151,8 +150,25 @@ const MarkdownEditor = (props) => {
         border-left: 1px solid ${cursorColor} !important;
       }
     `
-    const header = document.getElementsByTagName('head')[0];
     header.appendChild(customThemeStyle);
+    if (props.useHighlightJS) {
+      const { highlightScript, highlightThemeStyle } = fetchHighlightJS();
+      header.appendChild(highlightThemeStyle);
+      header.appendChild(highlightScript);
+    }
+  }
+
+  const fetchHighlightJS = () => {
+    const highlightScript = document.createElement("script");
+    const highlightThemeStyle = document.createElement("link");
+    highlightThemeStyle.rel = "stylesheet";
+    highlightScript.src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"
+    if (props.highlightTheme) {
+      highlightThemeStyle.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/${props.highlightTheme}.min.css`
+    } else {
+      highlightThemeStyle.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/agate.min.css`
+    }
+    return { highlightScript, highlightThemeStyle };
   }
 
   const commandListener = e => {
@@ -180,11 +196,6 @@ const MarkdownEditor = (props) => {
         }
         break;
       }
-      case 79: {
-        if (onOpenInsert) {
-          onOpenInsert(simplemde.codemirror);
-        }
-      }
       default:
         break;
     }
@@ -201,13 +212,13 @@ const MarkdownEditor = (props) => {
 MarkdownEditor.propTypes = {
   onSave: PropTypes.func,
   onDelete: PropTypes.func,
-  onOpenInsert: PropTypes.func,
+  codeMirrorHandle: PropTypes.func,
   initialValue: PropTypes.string,
   localSaveId: PropTypes.string,
-  spellChecker: PropTypes.bool,
-  editor: PropTypes.object,
-  preview: PropTypes.object,
-  toolbar: PropTypes.object
+  useSpellChecker: PropTypes.bool,
+  useHighlightJS: PropTypes.bool,
+  highlightTheme: PropTypes.string,
+  theme: PropTypes.object,
 }
 
 export default MarkdownEditor;
