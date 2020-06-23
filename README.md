@@ -25,7 +25,7 @@ yarn add devkeep-md-editor
 |`theme`|This is theme object you can use to style toolbar, editor and preview parts, see below for options|object|
 
 ### Example theme object:
-```json
+```js
 {
   toolbar: {
     background: "#333",

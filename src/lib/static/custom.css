@@ -7,10 +7,20 @@
     color:#606c71;
 }
 
-#editor-container pre {
+.CodeMirror-code {
+    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+}
+
+.editor-preview-side pre {
     overflow-x: scroll;
     font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
 }
+
+.editor-preview pre {
+    overflow-x: scroll;
+    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+}
+
 
 #editor-container img {
     width: 100%
