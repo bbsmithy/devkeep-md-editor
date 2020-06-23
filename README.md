@@ -109,6 +109,7 @@ const App = () => {
         localSaveId="devkeep-save-1"
         spellChecker={false}
         useHighlightJS
+        highlightTheme="agate"
         theme={theme}
       />
   );

@@ -2,8 +2,8 @@ import React from "react"
 import { useEffect } from "react"
 import PropTypes from 'prop-types';
 import SimpleMDE from "simplemde"
-import "./static/mde.css";
-import "./static/custom.css";
+import "./mde.css";
+import "./custom.css";
 
 const keyCommands = [83, 69, 79];
 
@@ -75,6 +75,7 @@ const MarkdownEditor = (props) => {
       styleSelectedText: true,
     })
     applyStyleOptions();
+    props.codeMirrorHandle(simplemde.codemirror);
   }
 
   const applyStyleOptions = () => {

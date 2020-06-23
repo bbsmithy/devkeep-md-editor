@@ -1,228 +1,169 @@
-import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
-import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
-import React from 'react';
-import hljs from 'highlight.js';
-import 'highlight.js/styles/a11y-dark.css';
-import Controls from './Controls';
-import { createUseStyles } from 'react-jss';
+import React from "react";
+import { useEffect } from "react";
+import SimpleMDE from "simplemde";
+import "./mde.css";
+import "./custom.css";
+var keyCommands = [83, 69, 79];
 
-var decodeHtml = require("html-encoder-decoder").decode;
-
-var classAttr = 'class="';
-var codeBackTicks = '```';
-
-var showdown = require('showdown');
-
-var sd = new showdown.Converter();
-sd.addExtension(function () {
-  return [{
-    type: "output",
-    filter: function filter(text, converter, options) {
-      var left = "<pre><code\\b[^>]*>";
-      var right = "</code></pre>";
-      var flags = "g";
-
-      var replacement = function replacement(wholeMatch, match, left, right) {
-        match = decodeHtml(match);
-        var lang = (left.match(/class=\"([^ \"]+)/) || [])[1];
-
-        if (left.includes(classAttr)) {
-          var attrIndex = left.indexOf(classAttr) + classAttr.length;
-          left = left.slice(0, attrIndex) + 'hljs ' + left.slice(attrIndex);
-        } else {
-          left = left.slice(0, -1) + ' class="hljs">';
-        }
-
-        if (lang && hljs.getLanguage(lang)) {
-          return left + hljs.highlight(lang, match).value + right;
-        } else {
-          return left + hljs.highlightAuto(match).value + right;
-        }
-      };
-
-      return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
-    }
-  }];
-});
-var useStyles = createUseStyles(function () {
-  return {
-    mainContainer: {
-      width: '100%',
-      fontFamily: 'Arial, Helvetica, sans-serif',
-      '& h1, h2, h3, h4, h5, p': {
-        margin: 0,
-        padding: 10
-      },
-      '& blockquote': {
-        background: '#333',
-        borderLeft: '5px solid #ccc',
-        margin: '0.3em 10px',
-        padding: '0.5em 0px 0.5em 10px',
-        '& p': {
-          display: 'inline'
-        }
-      },
-      '& code': {
-        '& span': {
-          lineHeight: 1.3
-        }
-      }
-    },
-    markdownContainer: {
-      width: '100%',
-      height: '100%',
-      overflow: 'hidden'
-    },
-    htmlContainer: {
-      width: '100%',
-      height: '100%',
-      overflow: 'auto',
-      '& img': {
-        maxWidth: '100%'
-      }
-    },
-    markdownEditor: {
-      width: '98%',
-      height: '100%',
-      margin: 'auto',
-      padding: '1%',
-      fontSize: 14,
-      border: 'none',
-      resize: 'none',
-      '&:focus': {
-        outline: 'none'
-      }
-    }
-  };
-});
-
-var MdEditor = function MdEditor(props) {
-  var _React$useState = React.useState(),
-      _React$useState2 = _slicedToArray(_React$useState, 2),
-      html = _React$useState2[0],
-      _setHTML = _React$useState2[1];
-
-  var _React$useState3 = React.useState(''),
-      _React$useState4 = _slicedToArray(_React$useState3, 2),
-      md = _React$useState4[0],
-      _setMD = _React$useState4[1];
-
-  var _React$useState5 = React.useState(true),
-      _React$useState6 = _slicedToArray(_React$useState5, 2),
-      displayMD = _React$useState6[0],
-      setDisplayMD = _React$useState6[1];
-
-  var textarea = React.useRef(null);
-  var mdRef = React.useRef(md);
-  var htmlRef = React.useRef(html);
-  var classes = useStyles();
-  React.useEffect(function () {
-    setInitialContent();
-  }, []);
-  React.useEffect(function () {
-    if (!displayMD) {
-      var htmlToDisplay = createHTML(md);
-      setHTML(htmlToDisplay);
-    }
-
-    setTextAreaFocus(md.length);
+var MarkdownEditor = function MarkdownEditor(props) {
+  var onSave = props.onSave,
+      onDelete = props.onDelete,
+      initialValue = props.initialValue,
+      localSaveId = props.localSaveId,
+      useSpellChecker = props.useSpellChecker;
+  var simplemde;
+  useEffect(function () {
+    setUpSimpleMDE(initialValue);
     document.addEventListener('keydown', commandListener);
     return function () {
       return document.removeEventListener('keydown', commandListener);
     };
-  }, [displayMD]);
+  }, [initialValue]);
 
-  var setMD = function setMD(data) {
-    mdRef.current = data;
-
-    _setMD(data);
+  var setUpSimpleMDE = function setUpSimpleMDE(initialValue) {
+    simplemde = new SimpleMDE({
+      element: document.getElementById("editor"),
+      renderingConfig: {
+        singleLineBreaks: false,
+        codeSyntaxHighlighting: true
+      },
+      toolbar: ["bold", "italic", "heading", "|", "quote", "ordered-list", "unordered-list", "|", "code", "link", "image", "|", "preview", "side-by-side", "fullscreen", "|", {
+        name: "delete",
+        action: onDelete,
+        className: "fa fa-trash",
+        title: "Delete"
+      }, {
+        name: "save",
+        action: onSave,
+        className: "fa fa-save",
+        title: "Save"
+      }],
+      spellChecker: useSpellChecker,
+      initialValue: initialValue,
+      autofocus: true,
+      shortcuts: {
+        drawTable: "Cmd-Alt-T"
+      },
+      insertTexts: {
+        horizontalRule: ["", "\n\n-----\n\n"],
+        image: ["![](http://", ")"],
+        link: ["[", "](http://)"],
+        table: ["", "\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text      | Text     |\n\n"]
+      },
+      autosave: {
+        enabled: true,
+        uniqueId: localSaveId,
+        delay: 1000
+      },
+      styleSelectedText: true
+    });
+    applyStyleOptions();
+    props.codeMirrorHandle(simplemde.codemirror);
   };
 
-  var setHTML = function setHTML(data) {
-    htmlRef.current = data;
+  var applyStyleOptions = function applyStyleOptions() {
+    var _props$theme = props.theme,
+        editor = _props$theme.editor,
+        preview = _props$theme.preview,
+        toolbar = _props$theme.toolbar,
+        cursorColor = _props$theme.cursorColor;
+    var header = document.getElementsByTagName('head')[0];
+    var customThemeStyle = document.createElement('style');
+    var customStyleString = '';
+    if (preview) customStyleString = createPreviewStyles(preview);
+    if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
 
-    _setHTML(data);
-  };
+    if (editor) {
+      var editorStyle = ".CodeMirror {\n        background-color: ".concat(editor.background || "white", " !important;\n        color: ").concat(editor.color || "black", " !important;\n      }");
+      customStyleString = customStyleString + editorStyle;
+    }
 
-  var setInitialContent = function setInitialContent() {
-    var _props$initialContent = props.initialContent,
-        type = _props$initialContent.type,
-        content = _props$initialContent.content;
+    customThemeStyle.innerHTML = customStyleString + "\n      .CodeMirror-cursor {\n        border-left: 1px solid ".concat(cursorColor || "black", " !important;\n      }\n    ");
+    header.appendChild(customThemeStyle);
 
-    if (type === 'html') {
-      setHTML(content);
-      var newMarkdown = sd.makeMarkdown(content);
-      setMD(newMarkdown);
-    } else if (type === 'md') {
-      setMD(content);
-      var newHtml = sd.makeHtml(content);
-      setHTML(newHtml);
+    if (props.useHighlightJS) {
+      var _fetchHighlightJS = fetchHighlightJS(),
+          highlightScript = _fetchHighlightJS.highlightScript,
+          highlightThemeStyle = _fetchHighlightJS.highlightThemeStyle;
+
+      header.appendChild(highlightThemeStyle);
+      header.appendChild(highlightScript);
     }
   };
 
-  var setTextAreaFocus = function setTextAreaFocus(selectionEnd) {
-    if (textarea.current) {
-      textarea.current.focus();
-      textarea.current.setSelectionRange(selectionEnd, selectionEnd);
+  var createPreviewStyles = function createPreviewStyles(_ref) {
+    var _ref$codeBlockBackgro = _ref.codeBlockBackground,
+        codeBlockBackground = _ref$codeBlockBackgro === void 0 ? "black" : _ref$codeBlockBackgro,
+        _ref$background = _ref.background,
+        background = _ref$background === void 0 ? "white" : _ref$background,
+        _ref$color = _ref.color,
+        color = _ref$color === void 0 ? "black" : _ref$color;
+    return "\n    .editor-preview-side pre {\n      background: ".concat(codeBlockBackground, ";\n      padding: 5px\n    }\n    .editor-preview-side {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    .editor-preview-side.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    .editor-preview {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    .editor-preview pre {\n      background: ").concat(codeBlockBackground, ";\n      padding: 5px\n    }\n    .editor-preview.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    .editor-preview h1, h2 {\n      border-bottom: 1px solid ").concat(color, ";\n    }\n    .editor-preview.fullscreen h1, h2 {\n      border-bottom: 1px solid ").concat(color, ";\n    }\n    ");
+  };
+
+  var createToolbarStyles = function createToolbarStyles(_ref2) {
+    var _ref2$background = _ref2.background,
+        background = _ref2$background === void 0 ? "white" : _ref2$background,
+        _ref2$color = _ref2.color,
+        color = _ref2$color === void 0 ? "black" : _ref2$color,
+        _ref2$activeBtnColor = _ref2.activeBtnColor,
+        activeBtnColor = _ref2$activeBtnColor === void 0 ? "black" : _ref2$activeBtnColor,
+        _ref2$activeBtnBackgr = _ref2.activeBtnBackground,
+        activeBtnBackground = _ref2$activeBtnBackgr === void 0 ? "white" : _ref2$activeBtnBackgr,
+        _ref2$disabledBtnColo = _ref2.disabledBtnColor,
+        disabledBtnColor = _ref2$disabledBtnColo === void 0 ? "gray" : _ref2$disabledBtnColo,
+        _ref2$disabledBtnBack = _ref2.disabledBtnBackground,
+        disabledBtnBackground = _ref2$disabledBtnBack === void 0 ? "white" : _ref2$disabledBtnBack;
+    return "\n    .editor-toolbar {\n      background-color: ".concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    .editor-toolbar.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    .editor-toolbar a {\n      color: ").concat(color, " !important;\n    }\n    .editor-toolbar a.active {\n      color: ").concat(activeBtnColor, " !important;\n      background: ").concat(activeBtnBackground, " !important;\n    }\n    .editor-toolbar.fullscreen a {\n      color: ").concat(color, " !important;\n    }\n    .editor-toolbar.fullscreen a.active, a:hover {\n      color: ").concat(activeBtnColor, " !important;\n      background: ").concat(activeBtnBackground, " !important;\n    }\n    .editor-toolbar.disabled-for-preview a:not(.no-disable) {\n      color: ").concat(disabledBtnColor, " !important;\n      background: ").concat(disabledBtnBackground, " !important;\n    }\n    ");
+  };
+
+  var fetchHighlightJS = function fetchHighlightJS() {
+    var highlightScript = document.createElement("script");
+    var highlightThemeStyle = document.createElement("link");
+    highlightThemeStyle.rel = "stylesheet";
+    highlightScript.src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js";
+
+    if (props.highlightTheme) {
+      highlightThemeStyle.href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/".concat(props.highlightTheme, ".min.css");
+    } else {
+      highlightThemeStyle.href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/agate.min.css";
     }
+
+    return {
+      highlightScript: highlightScript,
+      highlightThemeStyle: highlightThemeStyle
+    };
   };
 
   var commandListener = function commandListener(e) {
     var keyCode = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
     var cmdUsed = window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey;
-    var tabPressed = keyCode === 9 && !e.shiftKey && !e.ctrlKey && !e.altKey;
-    var returnPressed = keyCode === 13;
-    var cmdKey = keyCode === 83 || keyCode === 68 || keyCode === 75;
+    var cmdKeyPressed = keyCommands.includes(keyCode);
 
-    if (cmdUsed && cmdKey) {
+    if (cmdUsed && cmdKeyPressed) {
       e.preventDefault();
       cmdAction(keyCode);
-    } else if (tabPressed || returnPressed) {
-      e.preventDefault();
-      formattingAction(keyCode);
     }
-  }; // cmd/ctrl (save(CMD+S), delete(CMD+D), toogle md/html(CMD+K)) handler
+  }; // cmd/ctrl (save(CMD+S), delete(CMD+D)) handler
 
 
   var cmdAction = function cmdAction(keyCode) {
     switch (keyCode) {
       case 83:
         {
-          var htmlToSave = createHTML(mdRef.current);
-          props.onSave(mdRef.current, htmlToSave);
-          setHTML(htmlToSave);
+          if (onSave) {
+            onSave(simplemde.value());
+          }
+
           break;
         }
 
       case 68:
         {
-          props.onDelete();
-          break;
-        }
+          if (onDelete) {
+            onDelete();
+          }
 
-      case 75:
-        {
-          setDisplayMD(!displayMD);
-          break;
-        }
-
-      default:
-        break;
-    }
-  }; // Tab or new line handler
-
-
-  var formattingAction = function formattingAction(keyCode) {
-    switch (keyCode) {
-      case 9:
-        {
-          insertTab();
-          break;
-        }
-
-      case 13:
-        {
-          insertNewLine();
           break;
         }
 
@@ -231,281 +172,11 @@ var MdEditor = function MdEditor(props) {
     }
   };
 
-  var insertTab = function insertTab() {
-    if (textarea.current.setSelectionRange) {
-      var sS = textarea.current.selectionStart;
-      var sE = textarea.current.selectionEnd;
-      var insertAfterText = textarea.current.value.substring(0, sS);
-      var insertAfterTextWithTab = insertAfterText + '   ';
-      var stateWithTab = insertAfterTextWithTab + textarea.current.value.substr(sE);
-      setMD(stateWithTab);
-      setTextAreaFocus(insertAfterTextWithTab.length);
-    }
-  };
-
-  var insertNewLine = function insertNewLine() {
-    // This will check the previous line for indentation
-    // and then add the same indentation to the new line
-    var _getSelectionState = getSelectionState(),
-        textBeforeSelection = _getSelectionState.textBeforeSelection,
-        textAfterSelection = _getSelectionState.textAfterSelection;
-
-    var currentLine = getCurrentLine();
-    var indent = currentLine.match(/^\s*/)[0];
-    var textBeforeWithIndent = textBeforeSelection + '\n' + indent;
-    var stateWithNewLine = textBeforeWithIndent + textAfterSelection;
-    saveMDAndHTMLState(stateWithNewLine);
-    setTextAreaFocus(textBeforeWithIndent.length);
-  };
-
-  var saveMDAndHTMLState = function saveMDAndHTMLState(markdown) {
-    setMD(markdown);
-  };
-
-  var createHTML = function createHTML(markdown) {
-    return sd.makeHtml(markdown);
-  };
-
-  var onChangeMarkdown = function onChangeMarkdown(evt) {
-    saveMDAndHTMLState(evt.currentTarget.value);
-  };
-
-  var getCurrentLine = function getCurrentLine() {
-    var sStart = textarea.current.selectionStart;
-    return textarea.current.value.substr(0, sStart).split('\n').pop();
-  };
-
-  var getSelectionState = function getSelectionState() {
-    var sStart = textarea.current.selectionStart;
-    var sEnd = textarea.current.selectionEnd;
-    var textBeforeSelection = textarea.current.value.substring(0, sStart);
-    var selectedText = textarea.current.value.substring(sStart, sEnd);
-    var textAfterSelection = textarea.current.value.substr(sEnd);
-    return {
-      textBeforeSelection: textBeforeSelection,
-      selectedText: selectedText,
-      textAfterSelection: textAfterSelection
-    };
-  };
-
-  var replaceHeadingMD = function replaceHeadingMD(heading, headingMDCode) {
-    var filteredHeading = heading.replace(/#/g, '').trim();
-    var newHeading = "".concat(headingMDCode, " ").concat(filteredHeading);
-    return newHeading;
-  };
-
-  var titleTransform = function titleTransform(mdMark) {
-    var _getSelectionState2 = getSelectionState(),
-        textBeforeSelection = _getSelectionState2.textBeforeSelection,
-        selectedText = _getSelectionState2.selectedText,
-        textAfterSelection = _getSelectionState2.textAfterSelection;
-
-    var newHeading = replaceHeadingMD(selectedText, mdMark);
-    var stateWithMDMark = textBeforeSelection + newHeading + textAfterSelection;
-    saveMDAndHTMLState(stateWithMDMark);
-  };
-
-  var codeTransform = function codeTransform() {
-    var _getSelectionState3 = getSelectionState(),
-        textBeforeSelection = _getSelectionState3.textBeforeSelection,
-        selectedText = _getSelectionState3.selectedText,
-        textAfterSelection = _getSelectionState3.textAfterSelection;
-
-    var selectedTextAsCodeBlock = "".concat(codeBackTicks) + '\n' + selectedText + '\n' + "".concat(codeBackTicks);
-    console.log(selectedText);
-    var stateWithCodeBlock = textBeforeSelection + selectedTextAsCodeBlock + textAfterSelection;
-    saveMDAndHTMLState(stateWithCodeBlock);
-  };
-
-  var blockqouteTransform = function blockqouteTransform() {
-    var _getSelectionState4 = getSelectionState(),
-        textBeforeSelection = _getSelectionState4.textBeforeSelection,
-        selectedText = _getSelectionState4.selectedText,
-        textAfterSelection = _getSelectionState4.textAfterSelection;
-
-    var selectedTextWithQuoteBlock = '';
-    selectedText.split('\n').forEach(function (line) {
-      selectedTextWithQuoteBlock += ">".concat(line, " \n");
-    });
-    var stateWithQuoteBlock = textBeforeSelection + selectedTextWithQuoteBlock + textAfterSelection;
-    saveMDAndHTMLState(stateWithQuoteBlock);
-  };
-
-  var textStyleTransform = function textStyleTransform(style) {
-    var _getSelectionState5 = getSelectionState(),
-        textBeforeSelection = _getSelectionState5.textBeforeSelection,
-        selectedText = _getSelectionState5.selectedText,
-        textAfterSelection = _getSelectionState5.textAfterSelection;
-
-    var selectedTextWithStyle = "".concat(style).concat(selectedText).concat(style);
-    var stateWithStyledBlock = textBeforeSelection + selectedTextWithStyle + textAfterSelection;
-    saveMDAndHTMLState(stateWithStyledBlock);
-  };
-
-  var ulListStyleTransform = function ulListStyleTransform() {
-    var _getSelectionState6 = getSelectionState(),
-        textBeforeSelection = _getSelectionState6.textBeforeSelection,
-        selectedText = _getSelectionState6.selectedText,
-        textAfterSelection = _getSelectionState6.textAfterSelection;
-
-    var lines = selectedText.split("\n");
-
-    if (lines.length === 1) {
-      var selectedTextWithListStyle = textBeforeSelection + "* ";
-      var stateWithNewULList = selectedTextWithListStyle + textAfterSelection;
-      saveMDAndHTMLState(stateWithNewULList);
-      setTextAreaFocus(selectedTextWithListStyle.length);
-    } else {
-      var linesTransformed = lines.reduce(function (acc, currentLine, idx) {
-        if (idx === 1) {
-          var lineToAdd = acc !== "" ? "\n* ".concat(acc) : acc + "\n* ".concat(currentLine, " \n");
-          return lineToAdd;
-        } else {
-          var _lineToAdd = currentLine !== "" ? "\n*".concat(currentLine, " \n") : "";
-
-          return acc + _lineToAdd;
-        }
-      });
-
-      var _selectedTextWithListStyle = textBeforeSelection + linesTransformed;
-
-      var stateWithNewOLList = _selectedTextWithListStyle + textAfterSelection;
-      saveMDAndHTMLState(stateWithNewOLList);
-      setTextAreaFocus(_selectedTextWithListStyle.length);
-    }
-  };
-
-  var olListStyleTransform = function olListStyleTransform() {
-    var _getSelectionState7 = getSelectionState(),
-        textBeforeSelection = _getSelectionState7.textBeforeSelection,
-        selectedText = _getSelectionState7.selectedText,
-        textAfterSelection = _getSelectionState7.textAfterSelection;
-
-    var lines = selectedText.split("\n");
-
-    if (lines.length === 1) {
-      var selectedTextWithListStyle = textBeforeSelection + "1. ".concat(lines[0]);
-      var stateWithNewOLList = selectedTextWithListStyle + textAfterSelection;
-      saveMDAndHTMLState(stateWithNewOLList);
-      setTextAreaFocus(selectedTextWithListStyle.length);
-    } else {
-      var linesTransformed = lines.reduce(function (acc, currentLine, idx) {
-        if (idx === 1) {
-          var lineToAdd = acc !== "" ? "\n".concat(idx, ". ").concat(acc, "\n") : acc + "\n".concat(idx, ". ").concat(currentLine, " \n");
-          return lineToAdd;
-        } else {
-          var _lineToAdd2 = currentLine !== "" ? "\n".concat(idx, ". ").concat(currentLine, " \n") : "";
-
-          return acc + _lineToAdd2;
-        }
-      });
-
-      var _selectedTextWithListStyle2 = textBeforeSelection + linesTransformed;
-
-      var _stateWithNewOLList = _selectedTextWithListStyle2 + textAfterSelection;
-
-      saveMDAndHTMLState(_stateWithNewOLList);
-      setTextAreaFocus(_selectedTextWithListStyle2.length);
-    }
-  };
-
-  var onSelectControl = function onSelectControl(evt) {
-    var control = evt.currentTarget.value;
-
-    switch (control) {
-      case 'H1':
-        {
-          titleTransform('#');
-          break;
-        }
-
-      case 'H2':
-        {
-          titleTransform('##');
-          break;
-        }
-
-      case 'H3':
-        {
-          titleTransform('###');
-          break;
-        }
-
-      case 'H4':
-        {
-          titleTransform('####');
-          break;
-        }
-
-      case 'CODE':
-        {
-          codeTransform();
-          break;
-        }
-
-      case 'BLOCKQUOTE':
-        {
-          blockqouteTransform();
-          break;
-        }
-
-      case 'BOLD':
-        {
-          textStyleTransform('**');
-          break;
-        }
-
-      case 'ITALIC':
-        {
-          textStyleTransform('*');
-          break;
-        }
-
-      case 'OL':
-        {
-          olListStyleTransform();
-          break;
-        }
-
-      case 'UL':
-        {
-          ulListStyleTransform();
-          break;
-        }
-
-      default:
-        {
-          console.log('NO CONTROL');
-        }
-    }
-  };
-
-  return React.createElement(React.Fragment, null, displayMD && React.createElement(Controls, {
-    buttonStyle: props.styles.btn,
-    controlsContainer: props.styles.controlsContainer,
-    onSelectControl: onSelectControl
-  }), React.createElement("div", {
-    className: classes.mainContainer,
-    style: _objectSpread({
-      height: props.height
-    }, props.styles.mainContainer)
-  }, displayMD && React.createElement("div", {
-    className: classes.markdownContainer,
-    style: props.styles.markdownContainer
+  return React.createElement("div", {
+    id: "editor-container"
   }, React.createElement("textarea", {
-    className: classes.markdownEditor,
-    id: "devkeep-md-textarea",
-    style: props.styles.markdownEditor,
-    onChange: onChangeMarkdown,
-    value: md,
-    ref: textarea
-  })), !displayMD && html && React.createElement("div", {
-    className: classes.htmlContainer,
-    style: props.styles.htmlContainer,
-    dangerouslySetInnerHTML: {
-      __html: html
-    }
-  })));
+    id: "editor"
+  }));
 };
 
-export default MdEditor;
+export default MarkdownEditor;
