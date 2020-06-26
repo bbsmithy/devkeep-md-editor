@@ -92,14 +92,14 @@ const MarkdownEditor = (props) => {
       if (preview) customStyleString = createPreviewStyles(preview);
       if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
       if (editor) {
-        const editorStyle = `.CodeMirror {
+        const editorStyle = `#editor-container .CodeMirror {
         background-color: ${editor.background || "white"} !important;
         color: ${editor.color || "black"} !important;
       }`
         customStyleString = customStyleString + editorStyle;
       }
       customThemeStyle.innerHTML = customStyleString + `
-      .CodeMirror-cursor {
+      #editor-container .CodeMirror-cursor {
         border-left: 1px solid ${cursorColor || "black"} !important;
       }
     `
@@ -115,34 +115,34 @@ const MarkdownEditor = (props) => {
 
   const createPreviewStyles = ({ codeBlockBackground = "black", background = "white", color = "black" }) => {
     return `
-    .editor-preview-side pre {
+    #editor-container .editor-preview-side pre {
       background: ${codeBlockBackground};
       padding: 5px
     }
-    .editor-preview-side {
+    #editor-container .editor-preview-side {
       background-color: ${background} !important;
       color: ${color} !important;
     }
-    .editor-preview-side.fullscreen {
+    #editor-container .editor-preview-side.fullscreen {
       background-color: ${background} !important;
       color: ${color} !important;
     }
-    .editor-preview {
+    #editor-container .editor-preview {
       background-color: ${background} !important;
       color: ${color} !important;
     }
-    .editor-preview pre {
+    #editor-container .editor-preview pre {
       background: ${codeBlockBackground};
       padding: 5px
     }
-    .editor-preview.fullscreen {
+    #editor-container .editor-preview.fullscreen {
       background-color: ${background} !important;
       color: ${color} !important;
     }
-    .editor-preview h1, h2 {
+    #editor-container .editor-preview h1, h2 {
       border-bottom: 1px solid ${color};
     }
-    .editor-preview.fullscreen h1, h2 {
+    #editor-container .editor-preview.fullscreen h1, h2 {
       border-bottom: 1px solid ${color};
     }
     `
@@ -157,29 +157,29 @@ const MarkdownEditor = (props) => {
     disabledBtnBackground = "white",
   }) => {
     return `
-    .editor-toolbar {
+    #editor-container .editor-toolbar {
       background-color: ${background} !important;
       color: ${color} !important;
     }
-    .editor-toolbar.fullscreen {
+    #editor-container .editor-toolbar.fullscreen {
       background-color: ${background} !important;
       color: ${color} !important;
     }
-    .editor-toolbar a {
+    #editor-container .editor-toolbar a {
       color: ${color} !important;
     }
-    .editor-toolbar a.active {
+    #editor-container .editor-toolbar a.active {
       color: ${activeBtnColor} !important;
       background: ${activeBtnBackground} !important;
     }
-    .editor-toolbar .fullscreen a {
+    #editor-container .editor-toolbar .fullscreen a {
       color: ${color} !important;
     }
-    .editor-toolbar .fullscreen a.active, a:hover {
+    #editor-container .editor-toolbar .fullscreen a.active, a:hover {
       color: ${activeBtnColor} !important;
       background: ${activeBtnBackground} !important;
     }
-    .editor-toolbar.disabled-for-preview a:not(.no-disable) {
+    #editor-container .editor-toolbar.disabled-for-preview a:not(.no-disable) {
       color: ${disabledBtnColor} !important;
       background: ${disabledBtnBackground} !important;
     }
