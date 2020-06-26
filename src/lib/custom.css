@@ -1,24 +1,24 @@
 #editor-container{
     padding:0;
     margin:0;
-    font-family:open sans,helvetica neue,Helvetica,Arial,sans-serif;
+    font-family: open sans,helvetica neue,Helvetica,Arial,sans-serif;
     font-size:16px;
     line-height:1.5;
     color:#606c71;
 }
 
 .CodeMirror-code {
-    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
 }
 
 .editor-preview-side pre {
-    overflow-x: scroll;
-    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+    overflow-x: auto;
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
 }
 
 .editor-preview pre {
-    overflow-x: scroll;
-    font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+    overflow-x: auto;
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
 }
 
 

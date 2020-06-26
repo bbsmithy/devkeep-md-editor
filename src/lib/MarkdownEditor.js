@@ -9,52 +9,55 @@ const keyCommands = [83, 69, 79];
 
 const MarkdownEditor = (props) => {
 
-  const { onSave, onDelete, initialValue, localSaveId, useSpellChecker } = props;
+  const { onSave, onDelete, initialValue, localSaveId, useSpellChecker, toolbarOptions } = props;
   let simplemde;
 
   useEffect(() => {
     setUpSimpleMDE(initialValue);
     document.addEventListener('keydown', commandListener);
     return () => document.removeEventListener('keydown', commandListener);
-  }, [initialValue])
+  }, [])
 
   const setUpSimpleMDE = (initialValue) => {
+    const toolbar = toolbarOptions || ["bold",
+      "italic",
+      "heading",
+      "|",
+      "quote",
+      "ordered-list",
+      "unordered-list",
+      "|",
+      "code",
+      "link",
+      "image",
+      "table",
+      "|",
+      "preview",
+      "side-by-side",
+      "fullscreen",
+      "|"]
+
+    toolbar.push({
+      name: "delete",
+      action: onDelete,
+      className: "fa fa-trash",
+      title: "Delete",
+    })
+
+    toolbar.push({
+      name: "save",
+      action: onSave,
+      className: "fa fa-save",
+      title: "Save",
+    })
+
     simplemde = new SimpleMDE({
       element: document.getElementById("editor"),
       renderingConfig: {
         singleLineBreaks: false,
         codeSyntaxHighlighting: true,
       },
-      toolbar: [
-        "bold",
-        "italic",
-        "heading",
-        "|",
-        "quote",
-        "ordered-list",
-        "unordered-list",
-        "|",
-        "code",
-        "link",
-        "image",
-        "|",
-        "preview",
-        "side-by-side",
-        "fullscreen",
-        "|",
-        {
-          name: "delete",
-          action: onDelete,
-          className: "fa fa-trash",
-          title: "Delete",
-        },
-        {
-          name: "save",
-          action: onSave,
-          className: "fa fa-save",
-          title: "Save",
-        }
-      ],
+      toolbar,
       spellChecker: useSpellChecker,
       initialValue,
       autofocus: true,
@@ -81,24 +84,29 @@ const MarkdownEditor = (props) => {
   const applyStyleOptions = () => {
     const { theme: { editor, preview, toolbar, cursorColor } } = props;
     const header = document.getElementsByTagName('head')[0];
-    const customThemeStyle = document.createElement('style');
-    let customStyleString = '';
-    if (preview) customStyleString = createPreviewStyles(preview);
-    if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
-    if (editor) {
-      const editorStyle = `.CodeMirror {
+
+    if (!document.getElementById('devkeep-md-editor-theme')) {
+      const customThemeStyle = document.createElement('style');
+      customThemeStyle.id = "devkeep-md-editor-theme"
+      let customStyleString = '';
+      if (preview) customStyleString = createPreviewStyles(preview);
+      if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
+      if (editor) {
+        const editorStyle = `.CodeMirror {
         background-color: ${editor.background || "white"} !important;
         color: ${editor.color || "black"} !important;
       }`
-      customStyleString = customStyleString + editorStyle;
-    }
-    customThemeStyle.innerHTML = customStyleString + `
+        customStyleString = customStyleString + editorStyle;
+      }
+      customThemeStyle.innerHTML = customStyleString + `
       .CodeMirror-cursor {
         border-left: 1px solid ${cursorColor || "black"} !important;
       }
     `
-    header.appendChild(customThemeStyle);
-    if (props.useHighlightJS) {
+      header.appendChild(customThemeStyle);
+    }
+
+    if (props.useHighlightJS && !document.getElementById('devkeep-highlight-theme') && !document.getElementById('devkeep-highlight-script')) {
       const { highlightScript, highlightThemeStyle } = fetchHighlightJS();
       header.appendChild(highlightThemeStyle);
       header.appendChild(highlightScript);
@@ -164,10 +172,10 @@ const MarkdownEditor = (props) => {
       color: ${activeBtnColor} !important;
       background: ${activeBtnBackground} !important;
     }
-    .editor-toolbar.fullscreen a {
+    .editor-toolbar .fullscreen a {
       color: ${color} !important;
     }
-    .editor-toolbar.fullscreen a.active, a:hover {
+    .editor-toolbar .fullscreen a.active, a:hover {
       color: ${activeBtnColor} !important;
       background: ${activeBtnBackground} !important;
     }
@@ -179,10 +187,16 @@ const MarkdownEditor = (props) => {
   }
 
   const fetchHighlightJS = () => {
+
     const highlightScript = document.createElement("script");
     const highlightThemeStyle = document.createElement("link");
+
     highlightThemeStyle.rel = "stylesheet";
+    highlightThemeStyle.id = "devkeep-highlight-theme";
+
     highlightScript.src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"
+    highlightScript.id = "devkeep-highlight-script"
+
     if (props.highlightTheme) {
       highlightThemeStyle.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/${props.highlightTheme}.min.css`
     } else {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { render } from 'react-dom';
 import { MarkdownEditor } from './lib';
 
@@ -29,9 +29,11 @@ const theme = {
 
 const App = () => {
 
+  const [md, setMd] = useState(exmapleMD);
+
   // Called on (CMD/CRTL+S)
-  const onSave = (md) => {
-    console.log(md);
+  const onSave = (markdown) => {
+    setMd(markdown)
   };
 
   // Called on (CMD/CRTL+D)
@@ -48,11 +50,10 @@ const App = () => {
   return (
     <div style={{ width: "60%", margin: "auto" }}>
       <MarkdownEditor
-        initialValue={exmapleMD}
+        initialValue={md}
         onSave={onSave}
         onDelete={onDelete}
         codeMirrorHandle={codeMirrorHandle}
-        localSaveId="devkeep-save-1"
         useSpellChecker={false}
         useHighlightJS
         highlightTheme="agate"
