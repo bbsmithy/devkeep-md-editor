@@ -48,7 +48,10 @@ const App = () => {
   }
 
   return (
-    <div style={{ width: "60%", margin: "auto" }}>
+    <div style={{ width: "60%", margin: "auto", background: "black" }}>
+
+      <h1 style={{ color: 'white' }}>Test header bugfix</h1>
+
       <MarkdownEditor
         initialValue={md}
         onSave={onSave}
