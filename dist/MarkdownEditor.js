@@ -1,4 +1,5 @@
-import React from "react";
+import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
+import React, { useRef } from "react";
 import { useEffect } from "react";
 import SimpleMDE from "simplemde";
 import "./mde.css";
@@ -11,8 +12,9 @@ var MarkdownEditor = function MarkdownEditor(props) {
       initialValue = props.initialValue,
       localSaveId = props.localSaveId,
       useSpellChecker = props.useSpellChecker,
-      toolbarOptions = props.toolbarOptions;
-  var simplemde;
+      toolbarOptions = props.toolbarOptions,
+      theme = props.theme;
+  var simplemdeRef = useRef();
   useEffect(function () {
     setUpSimpleMDE(initialValue);
     document.addEventListener('keydown', commandListener);
@@ -20,22 +22,33 @@ var MarkdownEditor = function MarkdownEditor(props) {
       return document.removeEventListener('keydown', commandListener);
     };
   }, []);
+  useEffect(function () {
+    applyStyleOptions();
+  }, [theme]);
 
   var setUpSimpleMDE = function setUpSimpleMDE(initialValue) {
-    var toolbar = toolbarOptions || ["bold", "italic", "heading", "|", "quote", "ordered-list", "unordered-list", "|", "code", "link", "image", "table", "|", "preview", "side-by-side", "fullscreen", "|"];
-    toolbar.push({
-      name: "delete",
-      action: onDelete,
-      className: "fa fa-trash",
-      title: "Delete"
-    });
-    toolbar.push({
+    var toolbar = toolbarOptions ? [].concat(_toConsumableArray(toolbarOptions), [{
       name: "save",
       action: onSave,
       className: "fa fa-save",
       title: "Save"
-    });
-    simplemde = new SimpleMDE({
+    }, {
+      name: "delete",
+      action: onDelete,
+      className: "fa fa-trash",
+      title: "Delete"
+    }]) : ["bold", "italic", "heading", "|", "quote", "ordered-list", "unordered-list", "|", "code", "link", "image", "table", "|", "preview", "side-by-side", "fullscreen", "|", {
+      name: "delete",
+      action: onDelete,
+      className: "fa fa-trash",
+      title: "Delete"
+    }, {
+      name: "save",
+      action: onSave,
+      className: "fa fa-save",
+      title: "Save"
+    }];
+    simplemdeRef.current = new SimpleMDE({
       element: document.getElementById("editor"),
       renderingConfig: {
         singleLineBreaks: false,
@@ -61,42 +74,68 @@ var MarkdownEditor = function MarkdownEditor(props) {
       },
       styleSelectedText: true
     });
-    applyStyleOptions();
-    props.codeMirrorHandle(simplemde.codemirror);
+    props.codeMirrorHandle(simplemdeRef.current.codemirror);
   };
 
   var applyStyleOptions = function applyStyleOptions() {
-    var _props$theme = props.theme,
-        editor = _props$theme.editor,
-        preview = _props$theme.preview,
-        toolbar = _props$theme.toolbar,
-        cursorColor = _props$theme.cursorColor;
     var header = document.getElementsByTagName('head')[0];
+    var devkeepEditorThemeStyle = document.getElementById('devkeep-md-editor-theme');
 
-    if (!document.getElementById('devkeep-md-editor-theme')) {
+    if (devkeepEditorThemeStyle) {
+      var customStyleString = createThemeStyleSheet();
+      devkeepEditorThemeStyle.innerHTML = customStyleString;
+    } else {
       var customThemeStyle = document.createElement('style');
       customThemeStyle.id = "devkeep-md-editor-theme";
-      var customStyleString = '';
-      if (preview) customStyleString = createPreviewStyles(preview);
-      if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
 
-      if (editor) {
-        var editorStyle = "#editor-container .CodeMirror {\n        background-color: ".concat(editor.background || "white", " !important;\n        color: ").concat(editor.color || "black", " !important;\n      }");
-        customStyleString = customStyleString + editorStyle;
-      }
+      var _customStyleString = createThemeStyleSheet();
 
-      customThemeStyle.innerHTML = customStyleString + "\n      #editor-container .CodeMirror-cursor {\n        border-left: 1px solid ".concat(cursorColor || "black", " !important;\n      }\n    ");
+      customThemeStyle.innerHTML = _customStyleString;
       header.appendChild(customThemeStyle);
     }
 
-    if (props.useHighlightJS && !document.getElementById('devkeep-highlight-theme') && !document.getElementById('devkeep-highlight-script')) {
+    if (props.useHighlightJS) {
+      var highlightTheme = document.getElementById('devkeep-highlight-theme');
+
       var _fetchHighlightJS = fetchHighlightJS(),
           highlightScript = _fetchHighlightJS.highlightScript,
           highlightThemeStyle = _fetchHighlightJS.highlightThemeStyle;
 
-      header.appendChild(highlightThemeStyle);
-      header.appendChild(highlightScript);
+      if (highlightTheme) {
+        // Replace existing highlight theme
+        header.replaceChild(highlightThemeStyle, highlightTheme);
+      } else {
+        // Add highlight theme
+        header.appendChild(highlightThemeStyle);
+      }
+
+      if (!document.getElementById('devkeep-highlight-script')) {
+        header.appendChild(highlightScript);
+      }
     }
+  };
+
+  var createThemeStyleSheet = function createThemeStyleSheet() {
+    var _props$theme = props.theme,
+        editor = _props$theme.editor,
+        preview = _props$theme.preview,
+        toolbar = _props$theme.toolbar,
+        cursorColor = _props$theme.cursorColor,
+        height = _props$theme.height;
+    var customStyleString = '';
+    if (preview) customStyleString = createPreviewStyles(preview);
+    if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
+
+    if (editor) {
+      var editorStyle = "#editor-container .CodeMirror {\n        background-color: ".concat(editor.background || "white", " !important;\n        color: ").concat(editor.color || "black", " !important;\n        height: ").concat(height || "100%", ";\n      }\n      #editor-container .CodeMirror .fullscreen {\n        height: 100% !important\n      }\n      ");
+      customStyleString = customStyleString + editorStyle;
+    }
+
+    if (cursorColor) {
+      customStyleString = customStyleString + "\n        .CodeMirror-cursor {\n            border-left: 1px solid ".concat(cursorColor, " !important;\n          }\n        ");
+    }
+
+    return customStyleString;
   };
 
   var createPreviewStyles = function createPreviewStyles(_ref) {
@@ -105,8 +144,10 @@ var MarkdownEditor = function MarkdownEditor(props) {
         _ref$background = _ref.background,
         background = _ref$background === void 0 ? "white" : _ref$background,
         _ref$color = _ref.color,
-        color = _ref$color === void 0 ? "black" : _ref$color;
-    return "\n    #editor-container .editor-preview-side pre {\n      background: ".concat(codeBlockBackground, ";\n      padding: 5px\n    }\n    #editor-container .editor-preview-side {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-preview-side.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-preview {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-preview pre {\n      background: ").concat(codeBlockBackground, ";\n      padding: 5px\n    }\n    #editor-container .editor-preview.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-preview h1, h2 {\n      border-bottom: 1px solid ").concat(color, ";\n    }\n    #editor-container .editor-preview.fullscreen h1, h2 {\n      border-bottom: 1px solid ").concat(color, ";\n    }\n    ");
+        color = _ref$color === void 0 ? "black" : _ref$color,
+        _ref$height = _ref.height,
+        height = _ref$height === void 0 ? "100%" : _ref$height;
+    return "\n    #editor-container .editor-preview-side pre {\n      background: ".concat(codeBlockBackground, ";\n      padding: 5px\n    }\n    #editor-container .editor-preview-side {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n      height: ").concat(height, " !important;\n    }\n    #editor-container .editor-preview-side.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-preview {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n      height: ").concat(height, " !important;\n    }\n    #editor-container .editor-preview pre {\n      background: ").concat(codeBlockBackground, ";\n      padding: 5px\n    }\n    #editor-container .editor-preview.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-preview h1,\n    #editor-container .editor-preview h2 {\n      border-bottom: 1px solid ").concat(color, ";\n    }\n    #editor-container .editor-preview-side h1,\n    #editor-container .editor-preview-side h2 {\n      border-bottom: 1px solid ").concat(color, ";\n    }\n    #editor-container .editor-preview .fullscreen h1,\n    #editor-container .editor-preview .fullscreen h2 {\n      border-bottom: 1px solid ").concat(color, ";\n    }\n    ");
   };
 
   var createToolbarStyles = function createToolbarStyles(_ref2) {
@@ -162,7 +203,7 @@ var MarkdownEditor = function MarkdownEditor(props) {
       case 83:
         {
           if (onSave) {
-            onSave(simplemde.value());
+            onSave(simplemdeRef.current.value());
           }
 
           break;
