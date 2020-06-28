@@ -132,7 +132,12 @@ const MarkdownEditor = (props) => {
       const editorStyle = `#editor-container .CodeMirror {
         background-color: ${editor.background || "white"} !important;
         color: ${editor.color || "black"} !important;
-      }`
+        height: ${height || "100%"};
+      }
+      #editor-container .CodeMirror .fullscreen {
+        height: 100% !important
+      }
+      `
       customStyleString = customStyleString + editorStyle;
     }
     if (cursorColor) {
@@ -142,17 +147,10 @@ const MarkdownEditor = (props) => {
           }
         `
     }
-    if (height) {
-      customStyleString = customStyleString + `
-          #editor-container .CodeMirror-scroll {
-            height: ${height} !important;
-          }
-        `
-    }
     return customStyleString;
   }
 
-  const createPreviewStyles = ({ codeBlockBackground = "black", background = "white", color = "black" }) => {
+  const createPreviewStyles = ({ codeBlockBackground = "black", background = "white", color = "black", height = "100%" }) => {
     return `
     #editor-container .editor-preview-side pre {
       background: ${codeBlockBackground};
@@ -161,6 +159,7 @@ const MarkdownEditor = (props) => {
     #editor-container .editor-preview-side {
       background-color: ${background} !important;
       color: ${color} !important;
+      height: ${height} !important;
     }
     #editor-container .editor-preview-side.fullscreen {
       background-color: ${background} !important;
@@ -169,6 +168,7 @@ const MarkdownEditor = (props) => {
     #editor-container .editor-preview {
       background-color: ${background} !important;
       color: ${color} !important;
+      height: ${height} !important;
     }
     #editor-container .editor-preview pre {
       background: ${codeBlockBackground};

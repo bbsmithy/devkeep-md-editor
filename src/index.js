@@ -57,7 +57,7 @@ const greenTheme = {
   preview: { background: "#2E8B57", color: "white", codeBlockBackground: 'black' },
   editor: { background: "#2E8B57", color: "white" },
   cursorColor: "white",
-  height: "80vh"
+  height: "50vh"
 }
 
 const toolbarOptions = [
