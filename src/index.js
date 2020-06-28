@@ -82,7 +82,6 @@ const toolbarOptions = [
 
 const App = () => {
 
-  const [md, setMd] = useState(exmapleMD);
   const [firstTheme, setFirstTheme] = useState(true);
 
   const switchTheme = () => {
@@ -91,7 +90,7 @@ const App = () => {
 
   // Called on (CMD/CRTL+S)
   const onSave = (markdown) => {
-    setMd(markdown)
+    console.log(markdown)
   };
 
   // Called on (CMD/CRTL+D)
@@ -108,7 +107,7 @@ const App = () => {
   return (
     <div style={{ width: "60%", margin: "auto" }}>
       <MarkdownEditor
-        initialValue={md}
+        initialValue={exmapleMD}
         onSave={onSave}
         onDelete={onDelete}
         codeMirrorHandle={codeMirrorHandle}

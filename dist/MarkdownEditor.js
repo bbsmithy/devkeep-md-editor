@@ -29,7 +29,9 @@ var MarkdownEditor = function MarkdownEditor(props) {
   var setUpSimpleMDE = function setUpSimpleMDE(initialValue) {
     var toolbar = toolbarOptions ? [].concat(_toConsumableArray(toolbarOptions), [{
       name: "save",
-      action: onSave,
+      action: function action() {
+        return onSave(simplemdeRef.current.value());
+      },
       className: "fa fa-save",
       title: "Save"
     }, {
@@ -44,7 +46,9 @@ var MarkdownEditor = function MarkdownEditor(props) {
       title: "Delete"
     }, {
       name: "save",
-      action: onSave,
+      action: function action() {
+        return onSave(simplemdeRef.current.value());
+      },
       className: "fa fa-save",
       title: "Save"
     }];

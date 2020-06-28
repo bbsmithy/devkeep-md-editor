@@ -25,7 +25,7 @@ const MarkdownEditor = (props) => {
   const setUpSimpleMDE = (initialValue) => {
     const toolbar = toolbarOptions ? [...toolbarOptions, {
       name: "save",
-      action: onSave,
+      action: () => onSave(simplemdeRef.current.value()),
       className: "fa fa-save",
       title: "Save",
     }, {
@@ -58,7 +58,7 @@ const MarkdownEditor = (props) => {
         },
         {
           name: "save",
-          action: onSave,
+          action: () => onSave(simplemdeRef.current.value()),
           className: "fa fa-save",
           title: "Save",
         }]
