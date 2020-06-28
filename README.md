@@ -23,6 +23,8 @@ yarn add devkeep-md-editor
 |`useHighlightJS`|Enabling will add highlight.js script to the page|bool|
 |`highlightTheme`|Highlight.js theme to use - will add a css link tag with theme from highlight to page|string|
 |`theme`|This is theme object you can use to style toolbar, editor and preview parts, see below for options|object|
+|`toolbarOptions`|Toolbar icons to display see [simplemde docs](https://github.com/sparksuite/simplemde-markdown-editor#toolbar-icons) for options|array|
+
 
 ### Example theme object:
 ```js
