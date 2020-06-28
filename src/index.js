@@ -2,18 +2,35 @@ import React, { useState } from 'react';
 import { render } from 'react-dom';
 import { MarkdownEditor } from './lib';
 
-const exmapleMD = `
-# Hello
-Building a computer can be a very rewarding experience. Since you’re reading this, you’re probably thinking about building your next computer instead of buying one pre-built. This is a very viable option these days and can bring many benefits; you can learn a lot about computer hardware by building one, you get a totally personalized computer, you can choose better components and you may be able to save some money and have fun.
-Additionally, if you are the sort of person who wants to understand how things work, if you take broken stuff apart just to see how it all fits together, if you have a drawer somewhere full of “parts” you think may come in handy someday, then you just may be in the right place.
-*Test*
-# Hello
-Building a computer can be a very rewarding experience. Since you’re reading this, you’re probably thinking about building your next computer instead of buying one pre-built. This is a very viable option these days and can bring many benefits; you can learn a lot about computer hardware by building one, you get a totally personalized computer, you can choose better components and you may be able to save some money and have fun.
-Additionally, if you are the sort of person who wants to understand how things work, if you take broken stuff apart just to see how it all fits together, if you have a drawer somewhere full of “parts” you think may come in handy someday, then you just may be in the right place.
-*Test*
+const exmapleMD = `# Intro
+Go ahead, play around with the editor! Be sure to check out **bold** and *italic* styling, or even [links](https://google.com). You can type the Markdown syntax, use the toolbar, or use shortcuts like \`cmd-b\` or \`ctrl - b\`.
+
+## Code blocks
+
+\`\`\`javascript
+for (i = 0, len = cars.length, text = ""; i < len; i++) {
+  text += cars[i] + "<br>";
+}
+\`\`\`
+
+## Lists
+Unordered lists can be started using the toolbar or by typing \`* \`, \` - \`, or \` + \`. Ordered lists can be started by typing \`1. \`.
+
+#### Unordered
+* Lists are a piece of cake
+* They even auto continue as you type
+* A double enter will end them
+* Tabs and shift-tabs work too
+
+#### Ordered
+1. Numbered lists...
+2. ...work too!
+
+## What about images?
+![Yes](https://i.imgur.com/sZlktY7.png)
 `
 
-const theme = {
+const darkTheme = {
   toolbar: {
     background: "#333",
     color: "white",
@@ -25,11 +42,52 @@ const theme = {
   preview: { background: "#4b4747", color: "white", codeBlockBackground: 'black' },
   editor: { background: "#333", color: "white" },
   cursorColor: "white",
+  height: "80vh"
 }
+
+const greenTheme = {
+  toolbar: {
+    background: "#2E8B57",
+    color: "white",
+    activeBtnBackground: "#242020",
+    activeBtnColor: 'white',
+    disabledBtnBackground: "gray",
+    disabledBtnColor: '#333'
+  },
+  preview: { background: "#2E8B57", color: "white", codeBlockBackground: 'black' },
+  editor: { background: "#2E8B57", color: "white" },
+  cursorColor: "white",
+  height: "80vh"
+}
+
+const toolbarOptions = [
+  'bold',
+  'italic',
+  'heading',
+  '|',
+  'quote',
+  'ordered-list',
+  'unordered-list',
+  '|',
+  'code',
+  'link',
+  'image',
+  'table',
+  '|',
+  'preview',
+  'fullscreen',
+  'side-by-side',
+  '|',
+];
 
 const App = () => {
 
   const [md, setMd] = useState(exmapleMD);
+  const [firstTheme, setFirstTheme] = useState(true);
+
+  const switchTheme = () => {
+    setFirstTheme(!firstTheme)
+  }
 
   // Called on (CMD/CRTL+S)
   const onSave = (markdown) => {
@@ -57,8 +115,10 @@ const App = () => {
         useSpellChecker={false}
         useHighlightJS
         highlightTheme="agate"
-        theme={theme}
+        theme={firstTheme ? darkTheme : greenTheme}
+        toolbarOptions={toolbarOptions}
       />
+      <button onClick={switchTheme}>Switch Theme</button>
     </div>
 
   );

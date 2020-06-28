@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useRef } from "react"
 import { useEffect } from "react"
 import PropTypes from 'prop-types';
 import SimpleMDE from "simplemde"
@@ -9,8 +9,8 @@ const keyCommands = [83, 69, 79];
 
 const MarkdownEditor = (props) => {
 
-  const { onSave, onDelete, initialValue, localSaveId, useSpellChecker, toolbarOptions } = props;
-  let simplemde;
+  const { onSave, onDelete, initialValue, localSaveId, useSpellChecker, toolbarOptions, theme } = props;
+  const simplemdeRef = useRef();
 
   useEffect(() => {
     setUpSimpleMDE(initialValue);
@@ -18,40 +18,52 @@ const MarkdownEditor = (props) => {
     return () => document.removeEventListener('keydown', commandListener);
   }, [])
 
+  useEffect(() => {
+    applyStyleOptions();
+  }, [theme])
+
   const setUpSimpleMDE = (initialValue) => {
-    const toolbar = toolbarOptions || ["bold",
-      "italic",
-      "heading",
-      "|",
-      "quote",
-      "ordered-list",
-      "unordered-list",
-      "|",
-      "code",
-      "link",
-      "image",
-      "table",
-      "|",
-      "preview",
-      "side-by-side",
-      "fullscreen",
-      "|"]
-
-    toolbar.push({
-      name: "delete",
-      action: onDelete,
-      className: "fa fa-trash",
-      title: "Delete",
-    })
-
-    toolbar.push({
+    const toolbar = toolbarOptions ? [...toolbarOptions, {
       name: "save",
       action: onSave,
       className: "fa fa-save",
       title: "Save",
-    })
+    }, {
+      name: "delete",
+      action: onDelete,
+      className: "fa fa-trash",
+      title: "Delete",
+    }] : ["bold",
+        "italic",
+        "heading",
+        "|",
+        "quote",
+        "ordered-list",
+        "unordered-list",
+        "|",
+        "code",
+        "link",
+        "image",
+        "table",
+        "|",
+        "preview",
+        "side-by-side",
+        "fullscreen",
+        "|",
+        {
+          name: "delete",
+          action: onDelete,
+          className: "fa fa-trash",
+          title: "Delete",
+        },
+        {
+          name: "save",
+          action: onSave,
+          className: "fa fa-save",
+          title: "Save",
+        }]
 
-    simplemde = new SimpleMDE({
+    simplemdeRef.current = new SimpleMDE({
       element: document.getElementById("editor"),
       renderingConfig: {
         singleLineBreaks: false,
@@ -77,40 +89,67 @@ const MarkdownEditor = (props) => {
       },
       styleSelectedText: true,
     })
-    applyStyleOptions();
-    props.codeMirrorHandle(simplemde.codemirror);
+    props.codeMirrorHandle(simplemdeRef.current.codemirror);
   }
 
   const applyStyleOptions = () => {
-    const { theme: { editor, preview, toolbar, cursorColor } } = props;
     const header = document.getElementsByTagName('head')[0];
+    const devkeepEditorThemeStyle = document.getElementById('devkeep-md-editor-theme');
 
-    if (!document.getElementById('devkeep-md-editor-theme')) {
+    if (devkeepEditorThemeStyle) {
+      const customStyleString = createThemeStyleSheet();
+      devkeepEditorThemeStyle.innerHTML = customStyleString;
+    } else {
       const customThemeStyle = document.createElement('style');
       customThemeStyle.id = "devkeep-md-editor-theme"
-      let customStyleString = '';
-      if (preview) customStyleString = createPreviewStyles(preview);
-      if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
-      if (editor) {
-        const editorStyle = `#editor-container .CodeMirror {
-        background-color: ${editor.background || "white"} !important;
-        color: ${editor.color || "black"} !important;
-      }`
-        customStyleString = customStyleString + editorStyle;
-      }
-      customThemeStyle.innerHTML = customStyleString + `
-      #editor-container .CodeMirror-cursor {
-        border-left: 1px solid ${cursorColor || "black"} !important;
-      }
-    `
+      const customStyleString = createThemeStyleSheet();
+      customThemeStyle.innerHTML = customStyleString;
       header.appendChild(customThemeStyle);
     }
 
-    if (props.useHighlightJS && !document.getElementById('devkeep-highlight-theme') && !document.getElementById('devkeep-highlight-script')) {
+    if (props.useHighlightJS) {
+      const highlightTheme = document.getElementById('devkeep-highlight-theme');
       const { highlightScript, highlightThemeStyle } = fetchHighlightJS();
-      header.appendChild(highlightThemeStyle);
-      header.appendChild(highlightScript);
+      if (highlightTheme) {
+        // Replace existing highlight theme
+        header.replaceChild(highlightThemeStyle, highlightTheme);
+      } else {
+        // Add highlight theme
+        header.appendChild(highlightThemeStyle);
+      }
+      if (!document.getElementById('devkeep-highlight-script')) {
+        header.appendChild(highlightScript);
+      }
     }
+  }
+
+  const createThemeStyleSheet = () => {
+    const { theme: { editor, preview, toolbar, cursorColor, height } } = props;
+    let customStyleString = '';
+    if (preview) customStyleString = createPreviewStyles(preview);
+    if (toolbar) customStyleString = customStyleString + createToolbarStyles(toolbar);
+    if (editor) {
+      const editorStyle = `#editor-container .CodeMirror {
+        background-color: ${editor.background || "white"} !important;
+        color: ${editor.color || "black"} !important;
+      }`
+      customStyleString = customStyleString + editorStyle;
+    }
+    if (cursorColor) {
+      customStyleString = customStyleString + `
+        .CodeMirror-cursor {
+            border-left: 1px solid ${cursorColor} !important;
+          }
+        `
+    }
+    if (height) {
+      customStyleString = customStyleString + `
+          #editor-container .CodeMirror-scroll {
+            height: ${height} !important;
+          }
+        `
+    }
+    return customStyleString;
   }
 
   const createPreviewStyles = ({ codeBlockBackground = "black", background = "white", color = "black" }) => {
@@ -139,10 +178,16 @@ const MarkdownEditor = (props) => {
       background-color: ${background} !important;
       color: ${color} !important;
     }
-    #editor-container .editor-preview h1, h2 {
+    #editor-container .editor-preview h1,
+    #editor-container .editor-preview h2 {
       border-bottom: 1px solid ${color};
     }
-    #editor-container .editor-preview.fullscreen h1, h2 {
+    #editor-container .editor-preview-side h1,
+    #editor-container .editor-preview-side h2 {
+      border-bottom: 1px solid ${color};
+    }
+    #editor-container .editor-preview .fullscreen h1,
+    #editor-container .editor-preview .fullscreen h2 {
       border-bottom: 1px solid ${color};
     }
     `
@@ -220,7 +265,7 @@ const MarkdownEditor = (props) => {
     switch (keyCode) {
       case 83: {
         if (onSave) {
-          onSave(simplemde.value());
+          onSave(simplemdeRef.current.value());
         }
         break;
       }

@@ -21,12 +21,7 @@
     font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
 }
 
-
 #editor-container img {
-    width: 100%
-}
-
-#editor-container h1, h2 {
-    border-bottom: 1px solid white;
+    max-width: 100%
 }
 
