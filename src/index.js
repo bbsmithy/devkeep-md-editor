@@ -42,22 +42,22 @@ const darkTheme = {
   preview: { background: "#4b4747", color: "white", codeBlockBackground: 'black' },
   editor: { background: "#333", color: "white" },
   cursorColor: "white",
-  height: "80vh"
+  height: "85vh"
 }
 
 const greenTheme = {
   toolbar: {
-    background: "#2E8B57",
+    background: "green",
     color: "white",
     activeBtnBackground: "#242020",
     activeBtnColor: 'white',
     disabledBtnBackground: "gray",
     disabledBtnColor: '#333'
   },
-  preview: { background: "#2E8B57", color: "white", codeBlockBackground: 'black' },
-  editor: { background: "#2E8B57", color: "white" },
+  preview: { background: "green", color: "white", codeBlockBackground: 'black' },
+  editor: { background: "green", color: "white" },
   cursorColor: "white",
-  height: "50vh"
+  height: "85vh"
 }
 
 const toolbarOptions = [

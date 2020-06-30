@@ -1,5 +1,7 @@
 # devkeep-md-editor
 React markdown editor component thats uses SimpleMde and Highlight.js under the hood.
+Designed allow customizable theme.
+### [View live demo](https://bsmithdev.netlify.app/devkeep-md-editor)
 
 ## Install
 ```bash 
@@ -45,18 +47,25 @@ yarn add devkeep-md-editor
 ```
 
 ## Example
-Demo: 
+Demo: https://bsmithdev.netlify.app/devkeep-md-editor
 ```jsx
 import React, { useState } from 'react';
 import { render } from 'react-dom';
-import { MarkdownEditor } from './lib';
+import { MarkdownEditor } from 'devkeep-md-editor';
 
-const exmapleMD = `
-# Intro
-Go ahead, play around with the editor! Be sure to check out **bold** and *italic* styling, or even [links](https://google.com). You can type the Markdown syntax, use the toolbar, or use shortcuts like `cmd-b` or `ctrl-b`.
+const exmapleMD = `# Intro
+Go ahead, play around with the editor! Be sure to check out **bold** and *italic* styling, or even [links](https://google.com). You can type the Markdown syntax, use the toolbar, or use shortcuts like \`cmd-b\` or \`ctrl - b\`.
+
+## Code blocks
+
+\`\`\`javascript
+for (i = 0, len = cars.length, text = ""; i < len; i++) {
+  text += cars[i] + "<br>";
+}
+\`\`\`
 
 ## Lists
-Unordered lists can be started using the toolbar or by typing `* `, `- `, or `+ `. Ordered lists can be started by typing `1. `.
+Unordered lists can be started using the toolbar or by typing \`* \`, \` - \`, or \` + \`. Ordered lists can be started by typing \`1. \`.
 
 #### Unordered
 * Lists are a piece of cake
@@ -72,7 +81,7 @@ Unordered lists can be started using the toolbar or by typing `* `, `- `, or `+ 
 ![Yes](https://i.imgur.com/sZlktY7.png)
 `
 
-const theme = {
+const darkTheme = {
   toolbar: {
     background: "#333",
     color: "white",
@@ -84,10 +93,10 @@ const theme = {
   preview: { background: "#4b4747", color: "white", codeBlockBackground: 'black' },
   editor: { background: "#333", color: "white" },
   cursorColor: "white",
-  height: "87vh"
+  height: "85vh"
 }
 
-const secondTheme = {
+const greenTheme = {
   toolbar: {
     background: "green",
     color: "white",
@@ -96,10 +105,10 @@ const secondTheme = {
     disabledBtnBackground: "gray",
     disabledBtnColor: '#333'
   },
-  preview: { background: "green", color: "black", codeBlockBackground: 'black' },
-  editor: { background: "#333", color: "white" },
+  preview: { background: "green", color: "white", codeBlockBackground: 'black' },
+  editor: { background: "green", color: "white" },
   cursorColor: "white",
-  height: "87vh"
+  height: "85vh"
 }
 
 const toolbarOptions = [
