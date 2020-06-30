@@ -1,7 +1,11 @@
 # devkeep-md-editor
 React markdown editor component thats uses SimpleMde and Highlight.js under the hood.
-Designed allow customizable theme.
-### [View live demo](https://bsmithdev.netlify.app/devkeep-md-editor)
+Designed to allow customizable theme.
+
+### [View live demo here](https://bsmithdev.netlify.app/devkeep-md-editor)
+### [Follow me on twitter for updates](https://twitter.com/BSmithy77)
+
+https://twitter.com/BSmithy77
 
 ## Install
 ```bash 
