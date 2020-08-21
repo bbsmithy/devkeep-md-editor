@@ -159,7 +159,6 @@ const MarkdownEditor = (props) => {
     #editor-container .editor-preview-side {
       background-color: ${background} !important;
       color: ${color} !important;
-      height: ${height} !important;
     }
     #editor-container .editor-preview-side.fullscreen {
       background-color: ${background} !important;

@@ -5,8 +5,6 @@ Designed to allow customizable theme.
 ### [View live demo here](https://bsmithdev.netlify.app/devkeep-md-editor)
 ### [Follow me on twitter for updates](https://twitter.com/BSmithy77)
 
-https://twitter.com/BSmithy77
-
 ## Install
 ```bash 
 npm install devkeep-md-editor
