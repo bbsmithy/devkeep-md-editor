@@ -117,7 +117,6 @@ const MarkdownEditor = (props) => {
         backBtnElement.addEventListener("click", props.onBack)
         titleContainer.prepend(backBtnElement)
     }
-
     document.getElementsByClassName("editor-toolbar")[0].prepend(titleContainer)
   }
 
