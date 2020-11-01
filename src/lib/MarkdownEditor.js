@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { createElement, useRef } from "react"
 import { useEffect } from "react"
 import PropTypes from 'prop-types';
 import SimpleMDE from "simplemde"
@@ -33,7 +33,9 @@ const MarkdownEditor = (props) => {
       action: onDelete,
       className: "fa fa-trash",
       title: "Delete",
-    }] : ["bold",
+    }] : [
+        "|",
+        "bold",
         "italic",
         "heading",
         "|",
@@ -88,8 +90,52 @@ const MarkdownEditor = (props) => {
         delay: 1000,
       },
       styleSelectedText: true,
+      status: false
     })
+    if (props.defaultView) setupDefaultView(props.defaultView)
+    if (props.title) setupTitle(props.title)
     props.codeMirrorHandle(simplemdeRef.current.codemirror);
+  }
+
+  const setupTitle = (title) => {
+    const titleContainer = document.createElement('div')
+    const titleElement = document.createElement('h4')
+    titleElement.innerText = props.title
+    titleElement.style.margin = "8px 0px 8px 5px" 
+    titleElement.style.display = "inline-block"
+    titleContainer.appendChild(titleElement)
+    if (props.onBack) {
+        const backBtnElement = document.createElement('div')
+        backBtnElement.innerHTML = '<i class="fa fa-arrow-left"></i>'
+        backBtnElement.style.display = "inline-block"
+        backBtnElement.style.cursor = "pointer"
+        backBtnElement.style.backgroundColor = props.theme.toolbar.background
+        backBtnElement.style.borderRadius = "5px"
+        backBtnElement.style.padding = "5px"
+        backBtnElement.style.color = props.theme.toolbar.color
+        backBtnElement.style.cursor = "pointer"
+        backBtnElement.addEventListener("click", props.onBack)
+        titleContainer.prepend(backBtnElement)
+    }
+
+    document.getElementsByClassName("editor-toolbar")[0].prepend(titleContainer)
+  }
+
+  const setupDefaultView = (defaultView) => {
+      switch (defaultView) {
+        case 'fullscreen':{
+          simplemdeRef.current.toggleFullScreen()
+          break;
+        }
+        case 'preview':{
+          simplemdeRef.current.togglePreview()
+          break;
+        }
+        case 'side-by-side':{
+          simplemdeRef.current.toggleSideBySide()
+          break;
+        }
+      }
   }
 
   const applyStyleOptions = () => {
@@ -199,15 +245,18 @@ const MarkdownEditor = (props) => {
     activeBtnBackground = "white",
     disabledBtnColor = "gray",
     disabledBtnBackground = "white",
+    height = "82px"
   }) => {
     return `
     #editor-container .editor-toolbar {
       background-color: ${background} !important;
       color: ${color} !important;
+      height: ${height}
     }
     #editor-container .editor-toolbar.fullscreen {
       background-color: ${background} !important;
       color: ${color} !important;
+      height: ${height}
     }
     #editor-container .editor-toolbar a {
       color: ${color} !important;
@@ -297,9 +346,16 @@ MarkdownEditor.propTypes = {
   useHighlightJS: PropTypes.bool,
   highlightTheme: PropTypes.string,
   theme: PropTypes.object,
+  defaultView: PropTypes.string,
+  title: PropTypes.string,
+  onBack: PropTypes.func
 }
 
 export default MarkdownEditor;
+
+// Increase toolbar height
+// Dont display title inline
+// Increase top position of preview/editor to height of toolbar
 
 
 

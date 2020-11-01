@@ -37,9 +37,9 @@ const darkTheme = {
     activeBtnBackground: "#242020",
     activeBtnColor: 'white',
     disabledBtnBackground: "gray",
-    disabledBtnColor: '#333'
+    disabledBtnColor: '#333',
   },
-  preview: { background: "#4b4747", color: "white", codeBlockBackground: 'black' },
+  preview: { background: "#333", color: "white", codeBlockBackground: 'black' },
   editor: { background: "#333", color: "white" },
   cursorColor: "white",
   height: "85vh"
@@ -116,6 +116,9 @@ const App = () => {
         highlightTheme="agate"
         theme={firstTheme ? darkTheme : greenTheme}
         toolbarOptions={toolbarOptions}
+        defaultView="side-by-side"
+        title={"This is a demo"}
+        onBack={()=> alert('Go back')}
       />
       <button onClick={switchTheme}>Switch Theme</button>
     </div>

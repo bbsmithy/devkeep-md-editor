@@ -346,7 +346,7 @@
   .CodeMirror {
       height: auto;
       min-height: 300px;
-      border: 1px solid #ddd;
+      border-top: 1px solid white;
       border-bottom-left-radius: 4px;
       border-bottom-right-radius: 4px;
       padding: 10px;
@@ -361,7 +361,7 @@
   .CodeMirror-fullscreen {
       background: #fff;
       position: fixed !important;
-      top: 50px;
+      top: 82px;
       left: 0;
       right: 0;
       bottom: 0;
@@ -395,10 +395,6 @@
       height: 1px;
   }
   
-  .editor-toolbar:before {
-      margin-bottom: 8px
-  }
-  
   .editor-toolbar:after {
       margin-top: 8px
   }
@@ -409,7 +405,6 @@
       overflow-x: auto;
       overflow-y: hidden;
       white-space: nowrap;
-      padding-top: 10px;
       padding-bottom: 10px;
       box-sizing: border-box;
       background: #fff;
@@ -419,6 +414,8 @@
       left: 0;
       opacity: 1;
       z-index: 9;
+      border-top-left-radius: 0px;
+      border-top-right-radius: 0px;
   }
   
   .editor-toolbar.fullscreen::before {
@@ -448,7 +445,7 @@
       color: #2c3e50!important;
       width: 30px;
       height: 30px;
-      margin: 0;
+      margin: 0px 1px;
       border: 1px solid transparent;
       border-radius: 3px;
       cursor: pointer;
@@ -559,14 +556,15 @@
       position: fixed;
       bottom: 0;
       width: 50%;
-      top: 50px;
+      top: 82px;
       right: 0;
       background: #fafafa;
       z-index: 9;
       overflow: auto;
       display: none;
       box-sizing: border-box;
-      border: 1px solid #ddd;
+      border-top: 1px solid #ddd;
+      border-left: 1px solid #ddd;
   }
   
   .editor-preview-active-side {
