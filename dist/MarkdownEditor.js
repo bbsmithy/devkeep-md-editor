@@ -1,5 +1,5 @@
 import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
-import React, { useRef } from "react";
+import React, { createElement, useRef } from "react";
 import { useEffect } from "react";
 import SimpleMDE from "simplemde";
 import "./mde.css";
@@ -39,7 +39,7 @@ var MarkdownEditor = function MarkdownEditor(props) {
       action: onDelete,
       className: "fa fa-trash",
       title: "Delete"
-    }]) : ["bold", "italic", "heading", "|", "quote", "ordered-list", "unordered-list", "|", "code", "link", "image", "table", "|", "preview", "side-by-side", "fullscreen", "|", {
+    }]) : ["|", "bold", "italic", "heading", "|", "quote", "ordered-list", "unordered-list", "|", "code", "link", "image", "table", "|", "preview", "side-by-side", "fullscreen", "|", {
       name: "delete",
       action: onDelete,
       className: "fa fa-trash",
@@ -76,9 +76,59 @@ var MarkdownEditor = function MarkdownEditor(props) {
         uniqueId: localSaveId,
         delay: 1000
       },
-      styleSelectedText: true
+      styleSelectedText: true,
+      status: false
     });
+    if (props.defaultView) setupDefaultView(props.defaultView);
+    if (props.title) setupTitle(props.title);
     props.codeMirrorHandle(simplemdeRef.current.codemirror);
+  };
+
+  var setupTitle = function setupTitle(title) {
+    var titleContainer = document.createElement('div');
+    var titleElement = document.createElement('h4');
+    titleElement.innerText = props.title;
+    titleElement.style.margin = "8px 0px 8px 5px";
+    titleElement.style.display = "inline-block";
+    titleContainer.appendChild(titleElement);
+
+    if (props.onBack) {
+      var backBtnElement = document.createElement('div');
+      backBtnElement.innerHTML = '<i class="fa fa-arrow-left"></i>';
+      backBtnElement.style.display = "inline-block";
+      backBtnElement.style.cursor = "pointer";
+      backBtnElement.style.backgroundColor = props.theme.toolbar.background;
+      backBtnElement.style.borderRadius = "5px";
+      backBtnElement.style.padding = "5px";
+      backBtnElement.style.color = props.theme.toolbar.color;
+      backBtnElement.style.cursor = "pointer";
+      backBtnElement.addEventListener("click", props.onBack);
+      titleContainer.prepend(backBtnElement);
+    }
+
+    document.getElementsByClassName("editor-toolbar")[0].prepend(titleContainer);
+  };
+
+  var setupDefaultView = function setupDefaultView(defaultView) {
+    switch (defaultView) {
+      case 'fullscreen':
+        {
+          simplemdeRef.current.toggleFullScreen();
+          break;
+        }
+
+      case 'preview':
+        {
+          simplemdeRef.current.togglePreview();
+          break;
+        }
+
+      case 'side-by-side':
+        {
+          simplemdeRef.current.toggleSideBySide();
+          break;
+        }
+    }
   };
 
   var applyStyleOptions = function applyStyleOptions() {
@@ -166,8 +216,10 @@ var MarkdownEditor = function MarkdownEditor(props) {
         _ref2$disabledBtnColo = _ref2.disabledBtnColor,
         disabledBtnColor = _ref2$disabledBtnColo === void 0 ? "gray" : _ref2$disabledBtnColo,
         _ref2$disabledBtnBack = _ref2.disabledBtnBackground,
-        disabledBtnBackground = _ref2$disabledBtnBack === void 0 ? "white" : _ref2$disabledBtnBack;
-    return "\n    #editor-container .editor-toolbar {\n      background-color: ".concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-toolbar.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-toolbar a {\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-toolbar a.active {\n      color: ").concat(activeBtnColor, " !important;\n      background: ").concat(activeBtnBackground, " !important;\n    }\n    #editor-container .editor-toolbar .fullscreen a {\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-toolbar .fullscreen a.active, a:hover {\n      color: ").concat(activeBtnColor, " !important;\n      background: ").concat(activeBtnBackground, " !important;\n    }\n    #editor-container .editor-toolbar.disabled-for-preview a:not(.no-disable) {\n      color: ").concat(disabledBtnColor, " !important;\n      background: ").concat(disabledBtnBackground, " !important;\n    }\n    ");
+        disabledBtnBackground = _ref2$disabledBtnBack === void 0 ? "white" : _ref2$disabledBtnBack,
+        _ref2$height = _ref2.height,
+        height = _ref2$height === void 0 ? "82px" : _ref2$height;
+    return "\n    #editor-container .editor-toolbar {\n      background-color: ".concat(background, " !important;\n      color: ").concat(color, " !important;\n      height: ").concat(height, "\n    }\n    #editor-container .editor-toolbar.fullscreen {\n      background-color: ").concat(background, " !important;\n      color: ").concat(color, " !important;\n      height: ").concat(height, "\n    }\n    #editor-container .editor-toolbar a {\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-toolbar a.active {\n      color: ").concat(activeBtnColor, " !important;\n      background: ").concat(activeBtnBackground, " !important;\n    }\n    #editor-container .editor-toolbar .fullscreen a {\n      color: ").concat(color, " !important;\n    }\n    #editor-container .editor-toolbar .fullscreen a.active, a:hover {\n      color: ").concat(activeBtnColor, " !important;\n      background: ").concat(activeBtnBackground, " !important;\n    }\n    #editor-container .editor-toolbar.disabled-for-preview a:not(.no-disable) {\n      color: ").concat(disabledBtnColor, " !important;\n      background: ").concat(disabledBtnBackground, " !important;\n    }\n    ");
   };
 
   var fetchHighlightJS = function fetchHighlightJS() {
@@ -234,4 +286,6 @@ var MarkdownEditor = function MarkdownEditor(props) {
   }));
 };
 
-export default MarkdownEditor;
+export default MarkdownEditor; // Increase toolbar height
+// Dont display title inline
+// Increase top position of preview/editor to height of toolbar
