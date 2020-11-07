@@ -34,7 +34,6 @@ const MarkdownEditor = (props) => {
       className: "fa fa-trash",
       title: "Delete",
     }] : [
-        "|",
         "bold",
         "italic",
         "heading",
@@ -351,10 +350,6 @@ MarkdownEditor.propTypes = {
 }
 
 export default MarkdownEditor;
-
-// Increase toolbar height
-// Dont display title inline
-// Increase top position of preview/editor to height of toolbar
 
 
 

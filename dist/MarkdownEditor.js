@@ -39,7 +39,7 @@ var MarkdownEditor = function MarkdownEditor(props) {
       action: onDelete,
       className: "fa fa-trash",
       title: "Delete"
-    }]) : ["|", "bold", "italic", "heading", "|", "quote", "ordered-list", "unordered-list", "|", "code", "link", "image", "table", "|", "preview", "side-by-side", "fullscreen", "|", {
+    }]) : ["bold", "italic", "heading", "|", "quote", "ordered-list", "unordered-list", "|", "code", "link", "image", "table", "|", "preview", "side-by-side", "fullscreen", "|", {
       name: "delete",
       action: onDelete,
       className: "fa fa-trash",
@@ -286,6 +286,4 @@ var MarkdownEditor = function MarkdownEditor(props) {
   }));
 };
 
-export default MarkdownEditor; // Increase toolbar height
-// Dont display title inline
-// Increase top position of preview/editor to height of toolbar
+export default MarkdownEditor;
