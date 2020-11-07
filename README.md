@@ -28,7 +28,7 @@ yarn add devkeep-md-editor
 |`highlightTheme`|Highlight.js theme to use - will add a css link tag with theme from highlight to page|string|
 |`theme`|This is theme object you can use to style toolbar, editor and preview parts, see below for options|object|
 |`toolbarOptions`|Toolbar icons to display see [simplemde docs](https://github.com/sparksuite/simplemde-markdown-editor#toolbar-icons) for options|array|
-|`defaultView`|The default state to display the editor in, one of "fullscreen", "preview", "side-by-side" |string|
+|`defaultView`|The default state to display the editor in, one of "fullscreen", "preview", "side-by-side" (fullscreen and side-by-side are not available on mobile views) |string|
 |`title`|Title to display above editor|string|
 |`onBack`|Function to be called when back button is clicked|function|
 

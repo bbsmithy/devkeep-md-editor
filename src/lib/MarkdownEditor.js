@@ -91,6 +91,7 @@ const MarkdownEditor = (props) => {
       styleSelectedText: true,
       status: false
     })
+    console.log(simplemdeRef.current)
     if (props.defaultView) setupDefaultView(props.defaultView)
     if (props.title) setupTitle(props.title)
     props.codeMirrorHandle(simplemdeRef.current.codemirror);
@@ -122,15 +123,21 @@ const MarkdownEditor = (props) => {
   const setupDefaultView = (defaultView) => {
       switch (defaultView) {
         case 'fullscreen':{
-          simplemdeRef.current.toggleFullScreen()
+          if (simplemdeRef.current.toolbarElements["fullscreen"]){
+            simplemdeRef.current.toggleFullScreen()
+          }
           break;
         }
         case 'preview':{
-          simplemdeRef.current.togglePreview()
+          if (simplemdeRef.current.toolbarElements["preview"]) {
+            simplemdeRef.current.togglePreview()
+          }
           break;
         }
-        case 'side-by-side':{
-          simplemdeRef.current.toggleSideBySide()
+        case 'side-by-side': {
+          if (simplemdeRef.current.toolbarElements["side-by-side"]) {
+            simplemdeRef.current.toggleSideBySide()
+          }
           break;
         }
       }
