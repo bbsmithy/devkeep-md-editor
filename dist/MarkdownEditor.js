@@ -113,19 +113,28 @@ var MarkdownEditor = function MarkdownEditor(props) {
     switch (defaultView) {
       case 'fullscreen':
         {
-          simplemdeRef.current.toggleFullScreen();
+          if (simplemdeRef.current.toolbarElements["fullscreen"]) {
+            simplemdeRef.current.toggleFullScreen();
+          }
+
           break;
         }
 
       case 'preview':
         {
-          simplemdeRef.current.togglePreview();
+          if (simplemdeRef.current.toolbarElements["preview"]) {
+            simplemdeRef.current.togglePreview();
+          }
+
           break;
         }
 
       case 'side-by-side':
         {
-          simplemdeRef.current.toggleSideBySide();
+          if (simplemdeRef.current.toolbarElements["side-by-side"]) {
+            simplemdeRef.current.toggleSideBySide();
+          }
+
           break;
         }
     }

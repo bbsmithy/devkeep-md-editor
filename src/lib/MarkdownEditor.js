@@ -91,7 +91,6 @@ const MarkdownEditor = (props) => {
       styleSelectedText: true,
       status: false
     })
-    console.log(simplemdeRef.current)
     if (props.defaultView) setupDefaultView(props.defaultView)
     if (props.title) setupTitle(props.title)
     props.codeMirrorHandle(simplemdeRef.current.codemirror);
