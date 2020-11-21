@@ -9,7 +9,19 @@ const keyCommands = [83, 69, 79];
 
 const MarkdownEditor = (props) => {
 
-  const { onSave, onDelete, initialValue, localSaveId, useSpellChecker, toolbarOptions, theme } = props;
+  const {
+    onSave,
+    onDelete,
+    initialValue,
+    localSaveId,
+    useSpellChecker,
+    toolbarOptions,
+    theme,
+    defaultView,
+    simplemdeHandle,
+    codeMirrorHandle
+  } = props;
+
   const simplemdeRef = useRef();
 
   useEffect(() => {
@@ -91,9 +103,10 @@ const MarkdownEditor = (props) => {
       styleSelectedText: true,
       status: false
     })
-    if (props.defaultView) setupDefaultView(props.defaultView)
+    if (defaultView) setupDefaultView(defaultView)
     if (props.title) setupTitle(props.title)
-    props.codeMirrorHandle(simplemdeRef.current.codemirror);
+    if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
+    if (simplemdeHandle) simplemdeHandle(simplemdeRef.current)
   }
 
   const setupTitle = (title) => {
@@ -119,8 +132,8 @@ const MarkdownEditor = (props) => {
     document.getElementsByClassName("editor-toolbar")[0].prepend(titleContainer)
   }
 
-  const setupDefaultView = (defaultView) => {
-      switch (defaultView) {
+  const setupDefaultView = (viewType) => {
+      switch (viewType) {
         case 'fullscreen':{
           if (simplemdeRef.current.toolbarElements["fullscreen"]){
             simplemdeRef.current.toggleFullScreen()
@@ -344,13 +357,14 @@ MarkdownEditor.propTypes = {
   onSave: PropTypes.func,
   onDelete: PropTypes.func,
   codeMirrorHandle: PropTypes.func,
+  simplemdeHandle: PropTypes.func,
   initialValue: PropTypes.string,
   localSaveId: PropTypes.string,
   useSpellChecker: PropTypes.bool,
   useHighlightJS: PropTypes.bool,
   highlightTheme: PropTypes.string,
   theme: PropTypes.object,
-  defaultView: PropTypes.string,
+  viewType: PropTypes.string,
   title: PropTypes.string,
   onBack: PropTypes.func
 }
