@@ -13,7 +13,10 @@ var MarkdownEditor = function MarkdownEditor(props) {
       localSaveId = props.localSaveId,
       useSpellChecker = props.useSpellChecker,
       toolbarOptions = props.toolbarOptions,
-      theme = props.theme;
+      theme = props.theme,
+      defaultView = props.defaultView,
+      simplemdeHandle = props.simplemdeHandle,
+      codeMirrorHandle = props.codeMirrorHandle;
   var simplemdeRef = useRef();
   useEffect(function () {
     setUpSimpleMDE(initialValue);
@@ -79,9 +82,10 @@ var MarkdownEditor = function MarkdownEditor(props) {
       styleSelectedText: true,
       status: false
     });
-    if (props.defaultView) setupDefaultView(props.defaultView);
+    if (defaultView) setupDefaultView(defaultView);
     if (props.title) setupTitle(props.title);
-    props.codeMirrorHandle(simplemdeRef.current.codemirror);
+    if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
+    if (simplemdeHandle) simplemdeHandle(simplemdeRef.current);
   };
 
   var setupTitle = function setupTitle(title) {
@@ -109,8 +113,8 @@ var MarkdownEditor = function MarkdownEditor(props) {
     document.getElementsByClassName("editor-toolbar")[0].prepend(titleContainer);
   };
 
-  var setupDefaultView = function setupDefaultView(defaultView) {
-    switch (defaultView) {
+  var setupDefaultView = function setupDefaultView(viewType) {
+    switch (viewType) {
       case 'fullscreen':
         {
           if (simplemdeRef.current.toolbarElements["fullscreen"]) {
