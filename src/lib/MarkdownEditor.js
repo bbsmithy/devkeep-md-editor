@@ -2,6 +2,7 @@ import React, { createElement, useRef } from "react"
 import { useEffect } from "react"
 import PropTypes from 'prop-types';
 import SimpleMDE from "simplemde"
+import { createTitleElement, createTitleInputElement } from "./util"
 import "./mde.css";
 import "./custom.css";
 
@@ -104,32 +105,34 @@ const MarkdownEditor = (props) => {
       status: false
     })
     if (defaultView) setupDefaultView(defaultView)
-    if (props.title) setupTitle(props.title)
+    if (props.title) setupTitle(props.title, props.onEditTitle)
     if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
     if (simplemdeHandle) simplemdeHandle(simplemdeRef.current)
   }
 
-  const setupTitle = (title) => {
-    const titleContainer = document.createElement('div')
-    const titleElement = document.createElement('h4')
-    titleElement.innerText = props.title
-    titleElement.style.margin = "8px 0px 8px 5px" 
-    titleElement.style.display = "inline-block"
-    titleContainer.appendChild(titleElement)
-    if (props.onBack) {
-        const backBtnElement = document.createElement('div')
-        backBtnElement.innerHTML = '<i class="fa fa-arrow-left"></i>'
-        backBtnElement.style.display = "inline-block"
-        backBtnElement.style.cursor = "pointer"
-        backBtnElement.style.backgroundColor = props.theme.toolbar.background
-        backBtnElement.style.borderRadius = "5px"
-        backBtnElement.style.padding = "5px"
-        backBtnElement.style.color = props.theme.toolbar.color
-        backBtnElement.style.cursor = "pointer"
-        backBtnElement.addEventListener("click", props.onBack)
-        titleContainer.prepend(backBtnElement)
-    }
-    document.getElementsByClassName("editor-toolbar")[0].prepend(titleContainer)
+  const setupTitle = (title, onEditTitle) => {
+      const titleContainer = document.createElement('div')
+      if (onEditTitle) {
+        const titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle)
+        titleContainer.appendChild(titleInput)
+      } else {
+        const titleElement = createTitleElement(title)
+        titleContainer.appendChild(titleElement)
+      }
+      if (props.onBack) {
+          const backBtnElement = document.createElement('div')
+          backBtnElement.innerHTML = '<i class="fa fa-arrow-left"></i>'
+          backBtnElement.style.display = "inline-block"
+          backBtnElement.style.cursor = "pointer"
+          backBtnElement.style.backgroundColor = props.theme.toolbar.background
+          backBtnElement.style.borderRadius = "5px"
+          backBtnElement.style.padding = "5px"
+          backBtnElement.style.color = props.theme.toolbar.color
+          backBtnElement.style.cursor = "pointer"
+          backBtnElement.addEventListener("click", props.onBack)
+          titleContainer.prepend(backBtnElement)
+      }
+      document.getElementsByClassName("editor-toolbar")[0].prepend(titleContainer)
   }
 
   const setupDefaultView = (viewType) => {

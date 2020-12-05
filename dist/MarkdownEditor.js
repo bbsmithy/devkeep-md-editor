@@ -2,6 +2,7 @@ import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
 import React, { createElement, useRef } from "react";
 import { useEffect } from "react";
 import SimpleMDE from "simplemde";
+import { createTitleElement, createTitleInputElement } from "./util";
 import "./mde.css";
 import "./custom.css";
 var keyCommands = [83, 69, 79];
@@ -83,18 +84,21 @@ var MarkdownEditor = function MarkdownEditor(props) {
       status: false
     });
     if (defaultView) setupDefaultView(defaultView);
-    if (props.title) setupTitle(props.title);
+    if (props.title) setupTitle(props.title, props.onEditTitle);
     if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
     if (simplemdeHandle) simplemdeHandle(simplemdeRef.current);
   };
 
-  var setupTitle = function setupTitle(title) {
+  var setupTitle = function setupTitle(title, onEditTitle) {
     var titleContainer = document.createElement('div');
-    var titleElement = document.createElement('h4');
-    titleElement.innerText = props.title;
-    titleElement.style.margin = "8px 0px 8px 5px";
-    titleElement.style.display = "inline-block";
-    titleContainer.appendChild(titleElement);
+
+    if (onEditTitle) {
+      var titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle);
+      titleContainer.appendChild(titleInput);
+    } else {
+      var titleElement = createTitleElement(title);
+      titleContainer.appendChild(titleElement);
+    }
 
     if (props.onBack) {
       var backBtnElement = document.createElement('div');

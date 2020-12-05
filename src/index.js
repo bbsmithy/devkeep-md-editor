@@ -140,6 +140,7 @@ const App = () => {
         toolbarOptions={toolbarOptions}
         defaultView={"side-by-side"}
         title={"This is a demo"}
+        onEditTitle={(val) => {alert(val)}}
         onBack={()=> alert('Go back')}
       />
       <button onClick={switchTheme}>Switch Theme</button>
