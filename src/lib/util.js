@@ -1,6 +1,8 @@
-export const createTitleInputElement = (title, bg, onEdit, width) => {
+export const createTitleInputElement = ({title, bg, onEdit, width, autoFocus}) => {
     const titleInput = document.createElement('input')
     titleInput.value = title
+    titleInput.placeholder = "Insert title here"
+    titleInput.autofocus = autoFocus
     titleInput.style.margin = "8px 0px 8px 5px"
     titleInput.style.background = bg
     titleInput.style.border = "none"

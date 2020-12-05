@@ -142,6 +142,7 @@ const App = () => {
         title={"This is a demo"}
         onEditTitle={(val) => {alert(val)}}
         editTitleWidth={"50%"}
+        autoFocusEditTitle
         onBack={()=> alert('Go back')}
       />
       <button onClick={switchTheme}>Switch Theme</button>

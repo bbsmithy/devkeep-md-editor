@@ -65,7 +65,7 @@ var MarkdownEditor = function MarkdownEditor(props) {
       toolbar: toolbar,
       spellChecker: useSpellChecker,
       initialValue: initialValue,
-      autofocus: true,
+      autofocus: !props.autoFocusEditTitle,
       shortcuts: {
         drawTable: "Cmd-Alt-T"
       },
@@ -84,16 +84,22 @@ var MarkdownEditor = function MarkdownEditor(props) {
       status: false
     });
     if (defaultView) setupDefaultView(defaultView);
-    if (props.title) setupTitle(props.title, props.onEditTitle, props.editTitleWidth);
+    if (props.title) setupTitle(props.title, props.onEditTitle, props.editTitleWidth, props.autoFocusEditTitle);
     if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
     if (simplemdeHandle) simplemdeHandle(simplemdeRef.current);
   };
 
-  var setupTitle = function setupTitle(title, onEditTitle, width) {
+  var setupTitle = function setupTitle(title, onEditTitle, width, autoFocus) {
     var titleContainer = document.createElement('div');
 
     if (onEditTitle) {
-      var titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle, width);
+      var titleInput = createTitleInputElement({
+        title: title,
+        bg: theme.toolbar.background,
+        onEdit: onEditTitle,
+        width: width,
+        autoFocus: autoFocus
+      });
       titleContainer.appendChild(titleInput);
     } else {
       var titleElement = createTitleElement(title);

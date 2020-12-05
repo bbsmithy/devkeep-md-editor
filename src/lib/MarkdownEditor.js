@@ -86,7 +86,7 @@ const MarkdownEditor = (props) => {
       toolbar,
       spellChecker: useSpellChecker,
       initialValue,
-      autofocus: true,
+      autofocus: !props.autoFocusEditTitle,
       shortcuts: {
         drawTable: "Cmd-Alt-T"
       },
@@ -105,15 +105,18 @@ const MarkdownEditor = (props) => {
       status: false
     })
     if (defaultView) setupDefaultView(defaultView)
-    if (props.title) setupTitle(props.title, props.onEditTitle, props.editTitleWidth)
+    if (props.title) setupTitle(props.title, props.onEditTitle, props.editTitleWidth, props.autoFocusEditTitle)
     if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
     if (simplemdeHandle) simplemdeHandle(simplemdeRef.current)
   }
 
-  const setupTitle = (title, onEditTitle, width) => {
+  const setupTitle = (title, onEditTitle, width, autoFocus) => {
       const titleContainer = document.createElement('div')
       if (onEditTitle) {
-        const titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle, width)
+        const titleInput = createTitleInputElement({
+          title, bg: theme.toolbar.background, onEdit: onEditTitle, width,
+          autoFocus
+        })
         titleContainer.appendChild(titleInput)
       } else {
         const titleElement = createTitleElement(title)

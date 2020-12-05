@@ -32,6 +32,7 @@ yarn add devkeep-md-editor
 |`title`| Title to display above editor |string|
 |`editTitleWidth`| Width css value |string|
 |`onEditTitle`| Pass this prop to render title as input, when changed will fire event with new title value |function|
+|`autoFocusEditTitle`| Auto focus the edit title on render |boolean|
 |`onBack`|Function to be called when back button is clicked|function|
 
 

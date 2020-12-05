@@ -1,6 +1,13 @@
-export var createTitleInputElement = function createTitleInputElement(title, bg, onEdit, width) {
+export var createTitleInputElement = function createTitleInputElement(_ref) {
+  var title = _ref.title,
+      bg = _ref.bg,
+      onEdit = _ref.onEdit,
+      width = _ref.width,
+      autoFocus = _ref.autoFocus;
   var titleInput = document.createElement('input');
   titleInput.value = title;
+  titleInput.placeholder = "Insert title here";
+  titleInput.autofocus = autoFocus;
   titleInput.style.margin = "8px 0px 8px 5px";
   titleInput.style.background = bg;
   titleInput.style.border = "none";
