@@ -1,4 +1,4 @@
-export const createTitleInputElement = (title, bg, onEdit) => {
+export const createTitleInputElement = (title, bg, onEdit, width) => {
     const titleInput = document.createElement('input')
     titleInput.value = title
     titleInput.style.margin = "8px 0px 8px 5px"
@@ -8,6 +8,7 @@ export const createTitleInputElement = (title, bg, onEdit) => {
     titleInput.style.fontSize = "17px"
     titleInput.style.fontWeight = "bold"
     titleInput.style.fontFamily = "open sans,helvetica neue,Helvetica,Arial,sans-serif"
+    titleInput.style.width = width
     titleInput.addEventListener("change", (evt) => {
         onEdit(evt.target.value)
     })

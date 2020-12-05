@@ -30,6 +30,7 @@ yarn add devkeep-md-editor
 |`toolbarOptions`|Toolbar icons to display see [simplemde docs](https://github.com/sparksuite/simplemde-markdown-editor#toolbar-icons) for options|array|
 |`defaultView`|The default state to display the editor in, one of "fullscreen", "preview", "side-by-side" (fullscreen and side-by-side are not available on mobile views) |string|
 |`title`| Title to display above editor |string|
+|`editTitleWidth`| Width css value |string|
 |`onEditTitle`| Pass this prop to render title as input, when changed will fire event with new title value |function|
 |`onBack`|Function to be called when back button is clicked|function|
 

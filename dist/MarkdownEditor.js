@@ -84,16 +84,16 @@ var MarkdownEditor = function MarkdownEditor(props) {
       status: false
     });
     if (defaultView) setupDefaultView(defaultView);
-    if (props.title) setupTitle(props.title, props.onEditTitle);
+    if (props.title) setupTitle(props.title, props.onEditTitle, props.editTitleWidth);
     if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
     if (simplemdeHandle) simplemdeHandle(simplemdeRef.current);
   };
 
-  var setupTitle = function setupTitle(title, onEditTitle) {
+  var setupTitle = function setupTitle(title, onEditTitle, width) {
     var titleContainer = document.createElement('div');
 
     if (onEditTitle) {
-      var titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle);
+      var titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle, width);
       titleContainer.appendChild(titleInput);
     } else {
       var titleElement = createTitleElement(title);

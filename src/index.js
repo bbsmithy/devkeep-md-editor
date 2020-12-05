@@ -141,6 +141,7 @@ const App = () => {
         defaultView={"side-by-side"}
         title={"This is a demo"}
         onEditTitle={(val) => {alert(val)}}
+        editTitleWidth={"50%"}
         onBack={()=> alert('Go back')}
       />
       <button onClick={switchTheme}>Switch Theme</button>

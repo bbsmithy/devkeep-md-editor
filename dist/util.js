@@ -1,4 +1,4 @@
-export var createTitleInputElement = function createTitleInputElement(title, bg, onEdit) {
+export var createTitleInputElement = function createTitleInputElement(title, bg, onEdit, width) {
   var titleInput = document.createElement('input');
   titleInput.value = title;
   titleInput.style.margin = "8px 0px 8px 5px";
@@ -8,6 +8,7 @@ export var createTitleInputElement = function createTitleInputElement(title, bg,
   titleInput.style.fontSize = "17px";
   titleInput.style.fontWeight = "bold";
   titleInput.style.fontFamily = "open sans,helvetica neue,Helvetica,Arial,sans-serif";
+  titleInput.style.width = width;
   titleInput.addEventListener("change", function (evt) {
     onEdit(evt.target.value);
   });

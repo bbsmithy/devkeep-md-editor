@@ -105,15 +105,15 @@ const MarkdownEditor = (props) => {
       status: false
     })
     if (defaultView) setupDefaultView(defaultView)
-    if (props.title) setupTitle(props.title, props.onEditTitle)
+    if (props.title) setupTitle(props.title, props.onEditTitle, props.editTitleWidth)
     if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
     if (simplemdeHandle) simplemdeHandle(simplemdeRef.current)
   }
 
-  const setupTitle = (title, onEditTitle) => {
+  const setupTitle = (title, onEditTitle, width) => {
       const titleContainer = document.createElement('div')
       if (onEditTitle) {
-        const titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle)
+        const titleInput = createTitleInputElement(title, theme.toolbar.background, onEditTitle, width)
         titleContainer.appendChild(titleInput)
       } else {
         const titleElement = createTitleElement(title)
