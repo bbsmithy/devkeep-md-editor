@@ -139,7 +139,7 @@ const App = () => {
         theme={firstTheme ? darkTheme : greenTheme}
         toolbarOptions={toolbarOptions}
         defaultView={"side-by-side"}
-        title={"This is a demo"}
+        title={""}
         onEditTitle={(val) => {alert(val)}}
         editTitleWidth={"50%"}
         autoFocusEditTitle

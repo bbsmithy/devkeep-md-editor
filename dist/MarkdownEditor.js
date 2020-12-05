@@ -84,7 +84,7 @@ var MarkdownEditor = function MarkdownEditor(props) {
       status: false
     });
     if (defaultView) setupDefaultView(defaultView);
-    if (props.title) setupTitle(props.title, props.onEditTitle, props.editTitleWidth, props.autoFocusEditTitle);
+    if (props.title !== null) setupTitle(props.title, props.onEditTitle, props.editTitleWidth, props.autoFocusEditTitle);
     if (codeMirrorHandle) codeMirrorHandle(simplemdeRef.current.codemirror);
     if (simplemdeHandle) simplemdeHandle(simplemdeRef.current);
   };
